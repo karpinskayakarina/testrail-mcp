@@ -39,6 +39,12 @@ module.exports = function registerCases(server, client) {
     refs: z.string().optional().describe('Comma-separated reference IDs (e.g. Jira ticket keys)'),
     custom_steps: z.string().optional().describe('Test steps (plain text)'),
     custom_expected: z.string().optional().describe('Expected result'),
+    custom_preconds: z.string().optional().describe('Preconditions'),
+    custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
+    custom_regression: z.boolean().optional().describe('Is regression test'),
+    custom_smoke: z.boolean().optional().describe('Is smoke test'),
+    custom_isabtest: z.boolean().optional().describe('Is A/B test'),
+    custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
   }, async ({ section_id, ...data }) => {
     try { return ok(await client.addCase(section_id, data)); } catch (e) { return err(e); }
   });
@@ -53,6 +59,12 @@ module.exports = function registerCases(server, client) {
     refs: z.string().optional().describe('New reference IDs'),
     custom_steps: z.string().optional().describe('New test steps'),
     custom_expected: z.string().optional().describe('New expected result'),
+    custom_preconds: z.string().optional().describe('New preconditions'),
+    custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
+    custom_regression: z.boolean().optional().describe('Is regression test'),
+    custom_smoke: z.boolean().optional().describe('Is smoke test'),
+    custom_isabtest: z.boolean().optional().describe('Is A/B test'),
+    custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
   }, async ({ case_id, ...data }) => {
     try { return ok(await client.updateCase(case_id, data)); } catch (e) { return err(e); }
   });
