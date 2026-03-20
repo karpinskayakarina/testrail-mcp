@@ -45,6 +45,7 @@ module.exports = function registerCases(server, client) {
     custom_smoke: z.boolean().optional().describe('Is smoke test'),
     custom_isabtest: z.boolean().optional().describe('Is A/B test'),
     custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
+    custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
   }, async ({ section_id, ...data }) => {
     try { return ok(await client.addCase(section_id, data)); } catch (e) { return err(e); }
   });
@@ -65,6 +66,7 @@ module.exports = function registerCases(server, client) {
     custom_smoke: z.boolean().optional().describe('Is smoke test'),
     custom_isabtest: z.boolean().optional().describe('Is A/B test'),
     custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
+    custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
   }, async ({ case_id, ...data }) => {
     try { return ok(await client.updateCase(case_id, data)); } catch (e) { return err(e); }
   });
