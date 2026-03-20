@@ -39,6 +39,7 @@ module.exports = function registerCases(server, client) {
     refs: z.string().optional().describe('Comma-separated reference IDs (e.g. Jira ticket keys)'),
     custom_steps: z.string().optional().describe('Test steps (plain text)'),
     custom_expected: z.string().optional().describe('Expected result'),
+    custom_steps_separated: z.string().optional().describe('Test steps with expected results as JSON array: [{"content":"step","expected":"result"}]'),
     custom_preconds: z.string().optional().describe('Preconditions'),
     custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
     custom_regression: z.boolean().optional().describe('Is regression test'),
@@ -46,7 +47,10 @@ module.exports = function registerCases(server, client) {
     custom_isabtest: z.boolean().optional().describe('Is A/B test'),
     custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
     custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
-  }, async ({ section_id, ...data }) => {
+  }, async ({ section_id, custom_steps_separated, ...data }) => {
+    if (custom_steps_separated) {
+      try { data.custom_steps_separated = JSON.parse(custom_steps_separated); } catch { data.custom_steps_separated = custom_steps_separated; }
+    }
     try { return ok(await client.addCase(section_id, data)); } catch (e) { return err(e); }
   });
 
@@ -60,6 +64,7 @@ module.exports = function registerCases(server, client) {
     refs: z.string().optional().describe('New reference IDs'),
     custom_steps: z.string().optional().describe('New test steps'),
     custom_expected: z.string().optional().describe('New expected result'),
+    custom_steps_separated: z.string().optional().describe('Test steps with expected results as JSON array: [{"content":"step","expected":"result"}]'),
     custom_preconds: z.string().optional().describe('New preconditions'),
     custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
     custom_regression: z.boolean().optional().describe('Is regression test'),
@@ -67,7 +72,10 @@ module.exports = function registerCases(server, client) {
     custom_isabtest: z.boolean().optional().describe('Is A/B test'),
     custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
     custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
-  }, async ({ case_id, ...data }) => {
+  }, async ({ case_id, custom_steps_separated, ...data }) => {
+    if (custom_steps_separated) {
+      try { data.custom_steps_separated = JSON.parse(custom_steps_separated); } catch { data.custom_steps_separated = custom_steps_separated; }
+    }
     try { return ok(await client.updateCase(case_id, data)); } catch (e) { return err(e); }
   });
 
