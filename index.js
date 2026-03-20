@@ -14,11 +14,6 @@ const registerResults = require('./src/tools/results');
 const registerMilestones = require('./src/tools/milestones');
 
 const PORT = process.env.PORT || 3000;
-const AUTH_TOKEN = process.env.MCP_AUTH_TOKEN;
-
-if (!AUTH_TOKEN) {
-  process.stderr.write('Warning: MCP_AUTH_TOKEN is not set — server is unprotected\n');
-}
 
 function buildMcpServer() {
   const server = new McpServer({ name: 'testrail-mcp', version: '1.0.0' });
@@ -32,20 +27,10 @@ function buildMcpServer() {
   return server;
 }
 
-function bearerAuth(req, res, next) {
-  if (!AUTH_TOKEN) return next();
-  const header = req.headers['authorization'] || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  if (token !== AUTH_TOKEN) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-  next();
-}
-
 const app = express();
 app.use(express.json());
 
-app.post('/mcp', bearerAuth, async (req, res) => {
+app.post('/mcp', async (req, res) => {
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   const server = buildMcpServer();
   try {
@@ -59,7 +44,7 @@ app.post('/mcp', bearerAuth, async (req, res) => {
   }
 });
 
-app.get('/mcp', bearerAuth, async (req, res) => {
+app.get('/mcp', async (req, res) => {
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   const server = buildMcpServer();
   try {
