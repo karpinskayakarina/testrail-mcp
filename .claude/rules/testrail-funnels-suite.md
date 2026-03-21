@@ -62,8 +62,7 @@ Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT
 - Ask: "Тип scan? (hand scan / face scan)"
 
 **5. Scan source** *(if scan = yes)*
-- Check existing funnel spec in `tests/funnels/` first
-- If not found → ask: "Як користувач завантажує фото? (file — галерея / camera)"
+- **Rule:** ScanSource: FILE — ONLY for "Verify funnel flow with failed scan" case. ALL other cases → CAMERA. Do NOT ask.
 
 **6. Email marketing**
 - Ask: "Чи є email marketing? (yes / no)"
