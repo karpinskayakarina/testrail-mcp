@@ -58,6 +58,18 @@ Set these in the Railway dashboard:
 ### Projects, Suites, Runs, Results, Milestones
 Standard CRUD tools for each entity — `get_*`, `add_*`, `update_*`, `delete_*`.
 
+## Source Files (`src/tools/`)
+
+| File | Tools | Used |
+|------|-------|------|
+| `cases.js` | `get_case`, `get_cases`, `add_case`, `update_case`, `delete_case` | Active — main file for creating and updating test cases |
+| `sections.js` | `get_section`, `get_sections`, `add_section`, `update_section`, `delete_section` | Active — for creating funnel folders |
+| `projects.js` | `get_project`, `get_projects`, `add_project`, `update_project`, `delete_project` | Partially — `get_projects` to list available projects |
+| `suites.js` | `get_suite`, `get_suites`, `add_suite`, `update_suite`, `delete_suite` | Partially — `get_suites` to navigate project structure |
+| `runs.js` | `get_run`, `get_runs`, `add_run`, `update_run`, `close_run`, `delete_run` | Planned — for creating and managing test runs |
+| `results.js` | `get_results_for_run`, `get_results_for_case`, `add_result`, `add_result_for_case`, `add_results_for_cases` | Planned — for recording test execution results |
+| `milestones.js` | `get_milestone`, `get_milestones`, `add_milestone`, `update_milestone`, `delete_milestone` | Planned — for linking cases to releases |
+
 ## Key Fields for Funnel Test Cases
 
 Funnel test cases use **template_id: 2** (Steps template). Use `custom_steps_separated` — not `custom_steps`.
