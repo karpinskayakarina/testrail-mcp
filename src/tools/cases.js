@@ -29,6 +29,7 @@ const customFields = {
   custom_isabtest: z.boolean().optional().describe('Is A/B test'),
   custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
   writing_status: z.union([z.number().int(), z.string()]).optional().describe('Writing status (number or string, e.g. "ready_for_review")'),
+  custom_writing_status: z.number().int().optional().describe('Writing status custom field (try 1=Draft, 2=Ready for review, 3=Reviewed)'),
 };
 
 module.exports = function registerCases(server, client) {
