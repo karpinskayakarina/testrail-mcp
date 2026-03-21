@@ -6,6 +6,9 @@ type: reference
 
 # TestRail Funnel Test Cases — Rules
 
+> **Scope:** This rule applies to the **Funnels suite only** (AppNebula Funnels, Quiz funnels).
+> For other suites (AskNebula, API, Mobile: iOS, Mobile: Android) — separate rules will be added when those suites become active.
+
 ## TestRail Structure
 - Project: Nebula (ID: 6)
 - Suite: Funnels (ID: 486)

@@ -1,6 +1,10 @@
 # TestRail MCP Server
 
-A Model Context Protocol (MCP) server for interacting with the TestRail API. Deployed on Railway and used by Claude agents to create, read, and update test cases.
+A Model Context Protocol (MCP) server for interacting with the TestRail API. Deployed on Railway and used by Claude agents to create, read, and update test cases across multiple suites in the Nebula project.
+
+**Currently active:** Funnels (AppNebula Funnels, Quiz funnels)
+
+**Planned:** AskNebula, API, Mobile: iOS, Mobile: Android
 
 ## Deployment
 
@@ -84,13 +88,21 @@ custom_steps_separated: [
 
 ```
 Nebula (project_id: 6)
-└── Funnels (suite_id: 486)
-    └── AppNebula Funnels (section_id: 8648)
-        ├── Aura (section_id: 36639)
-        ├── Soulmate-sketch (section_id: 36637)
-        ├── Palmistry (section_id: 8707)
-        ├── birth-chart-calculator (section_id: 61057)
-        └── ...
+├── Mobile: iOS (suite_id: 136)                  [planned]
+├── Mobile: Android (suite_id: 137)              [planned]
+├── AskNebula (suite_id: 170)                    [planned]
+├── Funnels (suite_id: 486)                      [active]
+│   ├── Quiz funnels (section_id: 8694)
+│   │   ├── Registration catalogue
+│   │   ├── Simple registration
+│   │   └── ...
+│   └── AppNebula Funnels (section_id: 8648)
+│       ├── Aura (section_id: 36639)
+│       ├── Soulmate-sketch (section_id: 36637)
+│       ├── Palmistry (section_id: 8707)
+│       ├── birth-chart-calculator (section_id: 61057)
+│       └── ...
+└── API (suite_id: 1660)                         [planned]
 ```
 
 ## AI-Generated Test Cases
