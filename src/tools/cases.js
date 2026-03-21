@@ -9,6 +9,27 @@ function err(e) {
   return { content: [{ type: 'text', text: `Error: ${e.message}` }], isError: true };
 }
 
+function parseStepsSeparated(value) {
+  if (!value) return undefined;
+  try { return JSON.parse(value); }
+  catch { throw new Error('custom_steps_separated must be a valid JSON array'); }
+}
+
+const stepsSchema = z.string().optional().describe(
+  'Steps with expected results (template_id:2). JSON array: [{"content":"<p>step</p>","expected":"<p>result</p>","additional_info":"","refs":""}]'
+);
+
+const customFields = {
+  custom_steps_separated: stepsSchema,
+  custom_preconds: z.string().optional().describe('Preconditions text'),
+  custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
+  custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
+  custom_regression: z.boolean().optional().describe('Is regression test'),
+  custom_smoke: z.boolean().optional().describe('Is smoke test'),
+  custom_isabtest: z.boolean().optional().describe('Is A/B test'),
+  custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
+};
+
 module.exports = function registerCases(server, client) {
   server.tool('get_case', 'Get a single test case by ID', {
     case_id: z.number().int().positive().describe('Test case ID'),
@@ -29,54 +50,38 @@ module.exports = function registerCases(server, client) {
     try { return ok(await client.getCases(project_id, params)); } catch (e) { return err(e); }
   });
 
-  server.tool('add_case', 'Create a new test case in a section', {
+  server.tool('add_case', 'Create a new test case in a section. For funnel cases use custom_steps_separated (not custom_steps).', {
     section_id: z.number().int().positive().describe('Section ID'),
     title: z.string().describe('Test case title'),
     type_id: z.number().int().positive().optional().describe('Case type ID'),
     priority_id: z.number().int().positive().optional().describe('Priority ID'),
-    estimate: z.string().optional().describe('Estimated duration, e.g. "30s" or "2m"'),
+    estimate: z.string().optional().describe('Estimated duration, e.g. "10min"'),
     milestone_id: z.number().int().positive().optional().describe('Milestone ID'),
     refs: z.string().optional().describe('Comma-separated reference IDs (e.g. Jira ticket keys)'),
-    custom_steps: z.string().optional().describe('Test steps (plain text)'),
-    custom_expected: z.string().optional().describe('Expected result'),
-    custom_steps_separated: z.string().optional().describe('Test steps with expected results as JSON array: [{"content":"step","expected":"result"}]'),
-    custom_preconds: z.string().optional().describe('Preconditions'),
-    custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
-    custom_regression: z.boolean().optional().describe('Is regression test'),
-    custom_smoke: z.boolean().optional().describe('Is smoke test'),
-    custom_isabtest: z.boolean().optional().describe('Is A/B test'),
-    custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
-    custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
+    ...customFields,
   }, async ({ section_id, custom_steps_separated, ...data }) => {
-    if (custom_steps_separated) {
-      try { data.custom_steps_separated = JSON.parse(custom_steps_separated); } catch { data.custom_steps_separated = custom_steps_separated; }
-    }
-    try { return ok(await client.addCase(section_id, data)); } catch (e) { return err(e); }
+    try {
+      const parsed = parseStepsSeparated(custom_steps_separated);
+      if (parsed) data.custom_steps_separated = parsed;
+      return ok(await client.addCase(section_id, data));
+    } catch (e) { return err(e); }
   });
 
-  server.tool('update_case', 'Update an existing test case', {
+  server.tool('update_case', 'Update an existing test case. Always call get_case first to preserve shared_step_id steps and avoid overwriting them.', {
     case_id: z.number().int().positive().describe('Test case ID'),
     title: z.string().optional().describe('New title'),
-    type_id: z.number().int().positive().optional().describe('New type ID'),
-    priority_id: z.number().int().positive().optional().describe('New priority ID'),
+    type_id: z.number().int().positive().optional().describe('Case type ID — do not change for funnel cases'),
+    priority_id: z.number().int().positive().optional().describe('Priority ID — do not change for funnel cases'),
     estimate: z.string().optional().describe('New estimate'),
     milestone_id: z.number().int().positive().optional().describe('New milestone ID'),
     refs: z.string().optional().describe('New reference IDs'),
-    custom_steps: z.string().optional().describe('New test steps'),
-    custom_expected: z.string().optional().describe('New expected result'),
-    custom_steps_separated: z.string().optional().describe('Test steps with expected results as JSON array: [{"content":"step","expected":"result"}]'),
-    custom_preconds: z.string().optional().describe('New preconditions'),
-    custom_automation_status: z.number().int().optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
-    custom_regression: z.boolean().optional().describe('Is regression test'),
-    custom_smoke: z.boolean().optional().describe('Is smoke test'),
-    custom_isabtest: z.boolean().optional().describe('Is A/B test'),
-    custom_case_platform_dropdown: z.number().int().optional().describe('Platform (1=Web, 4=AppNebula)'),
-    custom_completion_status: z.number().int().optional().describe('Completion status (e.g. 4=Complete)'),
+    ...customFields,
   }, async ({ case_id, custom_steps_separated, ...data }) => {
-    if (custom_steps_separated) {
-      try { data.custom_steps_separated = JSON.parse(custom_steps_separated); } catch { data.custom_steps_separated = custom_steps_separated; }
-    }
-    try { return ok(await client.updateCase(case_id, data)); } catch (e) { return err(e); }
+    try {
+      const parsed = parseStepsSeparated(custom_steps_separated);
+      if (parsed) data.custom_steps_separated = parsed;
+      return ok(await client.updateCase(case_id, data));
+    } catch (e) { return err(e); }
   });
 
   server.tool('delete_case', 'Delete a test case (irreversible)', {
