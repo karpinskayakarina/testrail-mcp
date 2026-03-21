@@ -228,6 +228,7 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Look up in code first, ask only if missing
 - Ask ONE question at a time
 - Always confirm ReadingEmailButton with user
+- Always set `custom_completion_status: 2` (Ready for review) for new AI-generated cases
 
 ## DON'T
 - Don't omit "(AI generated)" from the title
@@ -237,3 +238,4 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Don't ask all questions at once
 - Don't skip Automation Notes
 - Don't change template_id, type_id, priority_id
+- Don't use `custom_completion_status: 4` (Done) for new cases — use 2 (Ready for review)
