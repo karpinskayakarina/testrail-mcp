@@ -1,5 +1,8 @@
 # Create TestRail Suite (Full Set)
 
+> **Scope:** Funnels only — suite_id: 486 (AppNebula Funnels & Quiz funnels).
+> Do NOT use for Mobile: iOS/Android, AskNebula, or API suites.
+
 Create a complete set of test cases for a new funnel in TestRail.
 
 ## Standard Set (based on Aura funnel)

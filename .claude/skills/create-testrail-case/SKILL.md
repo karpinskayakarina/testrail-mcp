@@ -1,5 +1,8 @@
 # Create TestRail Case
 
+> **Scope:** Funnels only — suite_id: 486 (AppNebula Funnels & Quiz funnels).
+> Do NOT use for Mobile: iOS/Android, AskNebula, or API suites.
+
 Create a single new funnel test case in TestRail following the current standard format.
 
 ## Instructions

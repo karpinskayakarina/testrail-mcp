@@ -1,5 +1,8 @@
 # Update TestRail Case
 
+> **Scope:** Funnels only — suite_id: 486 (AppNebula Funnels & Quiz funnels).
+> Do NOT use for Mobile: iOS/Android, AskNebula, or API suites.
+
 Update an existing funnel test case in TestRail to match the current standard format.
 
 ## Instructions
