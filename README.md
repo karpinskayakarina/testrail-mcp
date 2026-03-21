@@ -29,7 +29,7 @@ Set these in the Railway dashboard:
 | `TESTRAIL_URL` | TestRail instance URL (e.g. `https://yourcompany.testrail.io`) |
 | `TESTRAIL_USER` | TestRail user email |
 | `TESTRAIL_API_KEY` | TestRail API key |
-| `PORT` | Server port (default: 3000) |
+| `PORT` | Server port (default: 8080) |
 
 ## Available Tools
 
