@@ -91,8 +91,8 @@ Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT
 
 **12. Email button text**
 - Check `src/funnels/constants/email.ts` first
-- ALWAYS confirm with user — even if constant exists (there may be multiple options)
-- Ask: "Підтверджуєш, що текст кнопки в листі — '{value}'?"
+- If found → use it directly, do NOT ask
+- If not found → ask: "Який текст кнопки в листі?"
 
 **13. Upsell** *(if applicable)*
 - Ask: "Чи є upsell? (no / ULTRA_PACK / CONSULTATION)"
@@ -228,7 +228,7 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - **Before creating OR updating any case: go through the Required Questions checklist. Check code first, ask only what's missing — one question at a time.**
 - Look up in code first, ask only if missing
 - Ask ONE question at a time
-- Always confirm ReadingEmailButton with user — even if found in code, always ask
+- Always confirm ReadingEmailButton with user — only if NOT found in code
 - Always set `custom_completion_status: 2` (Ready for review) for new AI-generated cases
 
 ## DON'T
