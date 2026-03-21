@@ -17,10 +17,7 @@ type: reference
 
 ## Naming Convention
 All test cases created or updated by AI MUST have "(AI generated)" at the end of the title.
-Example: "Check successful payments for user with EU locale and email check (AI generated)"
-
-If there is a README.md file in the project — update it to document this convention:
-add a section "AI-generated test cases" explaining that cases marked with (AI generated) were created or improved by AI and follow the updated format described in these rules.
+Example: `"Check successful payments for user with EU locale and email check (AI generated)"`
 
 ---
 
@@ -57,15 +54,13 @@ Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT
 - If not found → ask: "Яка ціна підписки для successful payments test? (1$ / 5$ / 9$ / 13.67$)"
 
 **8. Subscription price for payment error test**
-- Same lookup logic as above
-- If not found → ask: "Яка ціна підписки для payment error test?"
+- Same lookup logic — ask only if not found
 
 **9. Subscription price for additional discount test**
-- Same lookup logic
-- If not found → ask: "Яка ціна підписки для additional discount test?"
+- Same lookup logic — ask only if not found
 
 **10. Subscription price for failed scan test** *(if scan = yes)*
-- Default: 13.67$ — suggest this and confirm
+- Default: 13.67$ — suggest and confirm
 - Ask: "Ціна для failed scan test? (default 13.67$)"
 
 **11. Email subject**
@@ -93,48 +88,96 @@ Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT
 
 ---
 
-## Steps Format Rules
+## Preconditions Format
 
-### Collapse random screens
-Replace detailed listing of screens where any answer works with a single step:
-> "Go through all quiz screens by selecting any available answers"
+Use this exact structure (see case 418133 as reference):
 
-### Keep explicit values for split screens
-Screens where the answer affects flow or is shown later — always specify:
-- /gender → Female / Male
-- /palmReadingGoal → intellect_decision / other
-- Any other screen listed in userData
-
-### Preconditions — required fields
-- Funnel URL (appnebula.co)
-- User has EU locale
-- Test data: gender, date (+ zodiac sign), split screen values
-- Scan source: FILE / CAMERA
-- EU subscription: X EUR trial / Y EUR after Z-day trial
-- For e2e: Chrome mobile | For manual: Chrome desktop
-
-### Automation Notes — ALWAYS add as the last step
 ```html
-<p><strong>🤖 Automation Notes</strong></p>
+<p>Funnel and its default flow is activated in Funnel builder</p>
+<p>Domain appnebula.co → <a href="https://appnebula.co/{slug}/prelanding">https://appnebula.co/{slug}/prelanding</a></p>
+<p>User has EU locale</p>
+<p><strong>Test data:</strong></p>
 <ul>
-  <li>funnelSubscriptions.{function}() → X EUR / Y EUR, Z-day trial</li>
-  <li>ReadingEmailButton.{CONSTANT} = '{button text}'</li>
-  <li>FunnelEmailSubject.{CONSTANT} = '{subject}' [або ⚠️ needs to be added to email.ts]</li>
-  <li>ScanSource: FILE / CAMERA</li>
-  <li>userData: { gender, date, splitField, zodiac }</li>
-  <li>responseCollectorRules: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, [BING_ANALYTICS,] W2A_LINK</li>
+  <li>Gender: <strong>Female</strong></li>
+  <li>Date of birth: <strong>Jun 28 1996</strong> (Zodiac: Cancer)</li>
+  <li>palmReadingGoal: <strong>intellect_decision</strong></li>
+  <li>Scan source: <strong>FILE</strong> (upload from gallery, not camera)</li>
+  <li>EU subscription: <strong>1 EUR</strong> trial / <strong>42.99 EUR</strong> per month after 7-day trial</li>
 </ul>
+<p>For e2e tests: Chrome mobile browser<br>For manual tests: Chrome desktop browser</p>
 ```
+
+Key rules:
+- Funnel URL must be a clickable `<a>` link
+- All specific values (gender, date, goal, price) must be wrapped in `<strong>`
+- Zodiac sign must be inferred from the date and included in parentheses
+- Scan source must specify FILE or CAMERA with explanation
+- Subscription must include trial price, recurring price, trial duration, and period
 
 ---
 
-## Shared Steps
-Reference each shared step only ONCE — TestRail auto-expands all sub-steps:
-```json
-{"shared_step_id": 17}
-{"shared_step_id": 74}
+## Steps Format
+
+### General rules
+- Use `<strong>` for all explicit values (Female, intellect_decision, 1 EUR, Jun 28 1996, Cancer, FILE)
+- Use `<ul><li>` for grouped sub-steps within one step
+- Wrap all content and expected in `<p>` tags
+
+### Step structure for quiz screens
+Collapse random screens into one step, but explicitly call out split screens within it:
+
+```html
+<!-- content -->
+<p>Go through all quiz screens by selecting any available answers:</p>
+<ul>
+  <li>Select any answer on /primaryHandUsage → /palmReadingGoal</li>
+  <li>Select <strong>intellect_decision</strong> on /palmReadingGoal → /goalSetup</li>
+  <li>Click Next on /goalSetup → /date</li>
+  <li>Enter date <strong>Jun 28 1996</strong> on /date → continue quiz</li>
+  <li>Go through remaining screens by selecting any available answers → /loadingRelationship</li>
+  <li>Check zodiac <strong>Cancer</strong> on /loadingRelationship</li>
+  <li>Select any answer on /decisionsSingle → /scanPreview</li>
+</ul>
+
+<!-- expected -->
+<p>All screens load correctly; Amplitude events present; zodiac <strong>Cancer</strong> displayed for Jun 28 1996; user redirected to /scanPreview</p>
 ```
-Never duplicate.
+
+### Scan step *(if scan exists)*
+```html
+<!-- content -->
+<p>Upload a valid hand photo from gallery (<strong>FILE upload, not camera</strong>) on /scanPreview</p>
+
+<!-- expected -->
+<p>Hand scan passes validation successfully; user redirected to /email</p>
+```
+
+### Shared Steps
+Reference shared steps by ID only — TestRail auto-expands sub-steps. Never duplicate content.
+
+| shared_step_id | What it covers |
+|----------------|----------------|
+| 17 | Post-payment onboarding screens + Web2App screen |
+| 74 | Full email flow (welcome, reading ready, app install, reading email, login/password) |
+
+Always include both in the correct order: `17` first, then `74`.
+
+### Automation Notes — ALWAYS last step
+```html
+<!-- content -->
+<p><strong>🤖 Automation Notes</strong></p>
+<ul>
+  <li>funnelSubscriptions.defaultTrial1() → 1 EUR / 42.99 EUR, 7-day trial, 30-day period</li>
+  <li>ReadingEmailButton.GET_MY_READING = 'Get my Reading'</li>
+  <li>FunnelEmailSubject.PALMISTRY_READINGS = '🔮 Get your Palmistry Reading' [або ⚠️ needs to be added to email.ts]</li>
+  <li>ScanSource: FILE (upload from gallery, not camera)</li>
+  <li>userData: { gender: UserGender.FEMALE, date: '1996-06-28', palmReadingGoal: 'intellect_decision', zodiac: ZodiacTypes.CANCER }</li>
+  <li>responseCollectorRules: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, BING_ANALYTICS, W2A_LINK</li>
+</ul>
+
+<!-- expected -->
+<p>-</p>
+```
 
 ---
 
@@ -154,17 +197,21 @@ custom_case_platform_dropdown: 4
 ---
 
 ## DO
-- Always add "(AI generated)" to the title of every case you create or update
-- If README.md exists in the project — update it with AI-generated convention
+- Always add "(AI generated)" to the title
+- Always use `<strong>` for explicit values in steps and preconditions
+- Always include zodiac sign inferred from date of birth
+- Always reference shared_step_id 17 and 74 (in this order) — never write their content manually
+- Always add Automation Notes as the very last step
+- Always get_case before update_case to preserve shared_step_id steps
 - Look up in code first, ask only if missing
 - Ask ONE question at a time
 - Always confirm ReadingEmailButton with user
-- Always add Automation Notes as last step
-- Always get_case before update_case
 
 ## DON'T
 - Don't omit "(AI generated)" from the title
+- Don't write out shared step content manually — use shared_step_id
+- Don't duplicate shared steps
 - Don't ask about subscription if it exists in subscription.ts
 - Don't ask all questions at once
 - Don't skip Automation Notes
-- Don't duplicate shared steps
+- Don't change template_id, type_id, priority_id
