@@ -225,9 +225,10 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Always reference shared_step_id 17 and 74 (in this order) — never write their content manually
 - Always add Automation Notes as the very last step
 - Always get_case before update_case to preserve shared_step_id steps
+- **Before creating OR updating any case: go through the Required Questions checklist. Check code first, ask only what's missing — one question at a time.**
 - Look up in code first, ask only if missing
 - Ask ONE question at a time
-- Always confirm ReadingEmailButton with user
+- Always confirm ReadingEmailButton with user — even if found in code, always ask
 - Always set `custom_completion_status: 2` (Ready for review) for new AI-generated cases
 
 ## DON'T
