@@ -15,6 +15,26 @@ type: reference
 - Section: AppNebula Funnels (ID: 8648)
 - Navigation: Nebula → Funnels → AppNebula Funnels → {Funnel name}
 
+## Standard Full Set of Test Cases
+
+Based on the Aura funnel. All titles must end with "(AI generated)".
+
+| # | Title | Condition |
+|---|-------|-----------|
+| 1 | Check successful payments for user with EU locale and email check | Always |
+| 2 | Check successful payments for user with USA locale | Always |
+| 3 | Check flow for user with EU locale with subscription payment error | Always |
+| 4 | Check flow for user with EU locale with additional discount payment | Always |
+| 5 | Check flow for user with USA locale with error on upsell payments | Always |
+| 6 | Verify funnel flow with failed scan for EU users | Only if scan exists |
+| 7 | Check flow for user with re-entering card after incorrect upsells payment | Always |
+| 8 | Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Always |
+| 9 | Check successful subscription flows on LATAM localizations | Always |
+| 10 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Always |
+| 11 | Check successful payments on landing | Always |
+
+---
+
 ## Naming Convention
 All test cases created or updated by AI MUST have "(AI generated)" at the end of the title.
 Example: `"Check successful payments for user with EU locale and email check (AI generated)"`
