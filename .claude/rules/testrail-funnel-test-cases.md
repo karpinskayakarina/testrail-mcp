@@ -28,29 +28,68 @@ add a section "AI-generated test cases" explaining that cases marked with (AI ge
 
 Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT A TIME, never all at once.
 
-### 1. Subscription → src/funnels/test-data/subscription.ts
-- If funnelSubscriptions.defaultTrial1/5/9/13_67 or funnel-specific function exists → use it, do NOT ask
-- If not found → ask: "Яка ціна підписки для цього тесту? (1$ / 5$ / 9$ / 13.67$)"
+### Required Questions (in order)
 
-### 2. FunnelEmailSubject → src/funnels/constants/email.ts
-- If constant exists for this funnel → use it
-- If not found → ask for the exact email subject string + add ⚠️ note in Automation Notes that constant needs to be added to email.ts
-- Pattern hint: scan funnel → '🔮 Get your {Funnel} and Palmistry Readings'; no scan → '🔮 Get your {Funnel Reading}'
+**1. Funnel name**
+- Confirm the slug (e.g. `palmistry`, `aura`, `birth-chart-calculator`)
 
-### 3. ReadingEmailButton → src/funnels/constants/email.ts
-- ALWAYS check and ALWAYS confirm with user — even if constant exists, there may be multiple options (e.g. PALMISTRY vs GET_MY_PALMISTRY_READING)
-- Ask: "Підтверджуєш, що текст кнопки в листі — '{value}'?" or "Який текст кнопки в листі?"
+**2. Report types**
+- Suggest based on funnel name (e.g. `aura` → `ReportType.AURA`)
+- Rule: if there is a hand scan → always include `ReportType.PALMISTRY`
+- Ask: "Які readings продукує цей фанел?"
 
-### 4. ScanSource → check existing funnel spec in tests/funnels/
-- If found in spec → use same value
-- If not found → ask: "Як користувач завантажує фото: з галереї (FILE) чи камерою (CAMERA)?"
+**3. Photo scan**
+- Ask: "Чи є photo scan? (no / yes)"
 
-### 5. userData split screen values → check existing funnel spec
-- If found → use same values (gender, palmReadingGoal, zodiac, etc.)
-- If not found → ask one field at a time
+**4. Scan type** *(if scan = yes)*
+- Ask: "Тип scan? (hand scan / face scan)"
 
-### 6. responseCollectorRules → check existing funnel spec
-- If not found → use default: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, W2A_LINK
+**5. Scan source** *(if scan = yes)*
+- Check existing funnel spec in `tests/funnels/` first
+- If not found → ask: "Як користувач завантажує фото? (file — галерея / camera)"
+
+**6. Email marketing**
+- Ask: "Чи є email marketing? (yes / no)"
+
+**7. Subscription price for successful payments test**
+- Check `src/funnels/test-data/subscription.ts` first
+- If `funnelSubscriptions.defaultTrial1/5/9/13_67` or funnel-specific function exists → use it, do NOT ask
+- If not found → ask: "Яка ціна підписки для successful payments test? (1$ / 5$ / 9$ / 13.67$)"
+
+**8. Subscription price for payment error test**
+- Same lookup logic as above
+- If not found → ask: "Яка ціна підписки для payment error test?"
+
+**9. Subscription price for additional discount test**
+- Same lookup logic
+- If not found → ask: "Яка ціна підписки для additional discount test?"
+
+**10. Subscription price for failed scan test** *(if scan = yes)*
+- Default: 13.67$ — suggest this and confirm
+- Ask: "Ціна для failed scan test? (default 13.67$)"
+
+**11. Email subject**
+- Check `src/funnels/constants/email.ts` first
+- If not found → suggest based on pattern and confirm:
+  - scan funnel → `'🔮 Get your {Funnel} and Palmistry Readings'`
+  - no scan → `'🔮 Get your {Funnel Reading}'`
+- Ask: "Підтверджуєш subject: '{suggested}'?"
+
+**12. Email button text**
+- Check `src/funnels/constants/email.ts` first
+- ALWAYS confirm with user — even if constant exists (there may be multiple options)
+- Ask: "Підтверджуєш, що текст кнопки в листі — '{value}'?"
+
+**13. Upsell** *(if applicable)*
+- Ask: "Чи є upsell? (no / ULTRA_PACK / CONSULTATION)"
+
+**14. userData fields** *(if not found in existing spec)*
+- Check `tests/funnels/` first
+- If not found → ask one field at a time: gender, zodiac, custom splits
+
+**15. responseCollectorRules**
+- Check existing funnel spec first
+- If not found → use default: `FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, W2A_LINK`
 
 ---
 
