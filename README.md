@@ -128,6 +128,18 @@ These cases follow the structured format defined in `.claude/rules/testrail-funn
 - Steps use `custom_steps_separated` with explicit values for split screens
 - Every case ends with an **🤖 Automation Notes** step containing constants for subscription, email subject, button text, scan source, userData, and responseCollectorRules
 
+## Skills (Slash Commands)
+
+Available for use in Claude Code via `/skill-name`. All skills apply to **Funnels suite only** (suite_id: 486).
+
+| Skill | Command | Description |
+|-------|---------|-------------|
+| Update TestRail Case | `/update-testrail-case` | Retrieve an existing funnel test case and update it to the current standard format (preconditions, steps, Automation Notes, shared steps, "(AI generated)" title) |
+| Create TestRail Case | `/create-testrail-case` | Create a single new funnel test case by asking required questions one at a time and generating the full structured case |
+| Create TestRail Suite | `/create-testrail-suite` | Create a complete set of 11 test cases for a new funnel, including section creation if needed |
+
+See `.claude/skills/` for full skill definitions.
+
 ## Rules for Agents
 
 See `.claude/rules/testrail-funnel-test-cases.md` for detailed rules on creating and updating funnel test cases.
