@@ -4,107 +4,125 @@ description: Rules for creating and improving funnel test cases in TestRail via 
 type: reference
 ---
 
-# TestRail Funnel Test Cases — MCP Rule
-
-## When to Use
-
-Use this rule when asked to:
-- "Check test case X in TestRail"
-- "Improve test case X in TestRail"
-- "Create a test case for funnel X"
-- "Update TestRail"
+# TestRail Funnel Test Cases — Rules
 
 ## TestRail Structure
+- Project: Nebula (ID: 6)
+- Suite: Funnels (ID: 486)
+- Section: AppNebula Funnels (ID: 8648)
+- Navigation: Nebula → Funnels → AppNebula Funnels → {Funnel name}
 
-| Entity | Value |
-|--------|-------|
-| Project | Nebula (ID: 6) |
-| Suite | Funnels (ID: 486) |
-| Section | AppNebula Funnels (ID: 8648) |
+## Naming Convention
+All test cases created or updated by AI MUST have "(AI generated)" at the end of the title.
+Example: "Check successful payments for user with EU locale and email check (AI generated)"
 
-**Navigation path:** Nebula → Funnels → AppNebula Funnels → {Funnel name}
+If there is a README.md file in the project — update it to document this convention:
+add a section "AI-generated test cases" explaining that cases marked with (AI generated) were created or improved by AI and follow the updated format described in these rules.
 
-**MCP tools sequence:**
-1. `get_sections` (project_id: 6, suite_id: 486) → find the funnel's section_id
-2. `get_cases` (project_id: 6, suite_id: 486, section_id: X, limit: 1) → verify access
-3. `get_cases` without limit → retrieve all cases
-4. `get_case` (case_id) → retrieve a specific case
-5. `update_case` → update a case
+---
 
-## Standard Test Cases (AppNebula Funnels)
+## Before Creating or Updating a Case
 
-| # | Title | Condition |
-|---|-------|-----------|
-| 1 | Check successful payments for user with EU locale and email check | Always |
-| 2 | Check flow for user with EU localization with additional discount payment | Always |
-| 3 | Check flow for user with EU localization with subscription payment error | Always |
-| 4 | Verify funnel flow with failed palmistry scan for EU users | Only if scan exists |
-| 5 | Check email marketing landing flow for EU user with email check | Only if email marketing exists |
-| 6 | Check email marketing paywall flow for EU user with email check | Only if email marketing exists |
+Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT A TIME, never all at once.
 
-## Required Fields for Automation
+### 1. Subscription → src/funnels/test-data/subscription.ts
+- If funnelSubscriptions.defaultTrial1/5/9/13_67 or funnel-specific function exists → use it, do NOT ask
+- If not found → ask: "Яка ціна підписки для цього тесту? (1$ / 5$ / 9$ / 13.67$)"
 
-### Preconditions
-- [ ] Funnel URL on appnebula.co
-- [ ] Device type (Chrome mobile for e2e, Chrome desktop for manual)
-- [ ] EU locale requirement
+### 2. FunnelEmailSubject → src/funnels/constants/email.ts
+- If constant exists for this funnel → use it
+- If not found → ask for the exact email subject string + add ⚠️ note in Automation Notes that constant needs to be added to email.ts
+- Pattern hint: scan funnel → '🔮 Get your {Funnel} and Palmistry Readings'; no scan → '🔮 Get your {Funnel Reading}'
 
-### Steps — required values
+### 3. ReadingEmailButton → src/funnels/constants/email.ts
+- ALWAYS check and ALWAYS confirm with user — even if constant exists, there may be multiple options (e.g. PALMISTRY vs GET_MY_PALMISTRY_READING)
+- Ask: "Підтверджуєш, що текст кнопки в листі — '{value}'?" or "Який текст кнопки в листі?"
 
-| Field | Requirement |
-|-------|-------------|
-| `gender` | Specific value: Female or Male (not "select any") |
-| `date` | Specific date (e.g. Jun 28 1996) + zodiac sign |
-| `palmReadingGoal` | Specific value (e.g. `intellect_decision`) |
-| `scan source` | FILE (upload from gallery) or CAMERA — must be explicit |
-| EU subscription | Exact price + recurring (e.g. 1 EUR / 42.99 EUR weekly) |
-| Email subject | Exact email subject line |
-| Email button text | Exact button text in the email |
+### 4. ScanSource → check existing funnel spec in tests/funnels/
+- If found in spec → use same value
+- If not found → ask: "Як користувач завантажує фото: з галереї (FILE) чи камерою (CAMERA)?"
 
-### Automation Notes (add as a separate step or additional_info)
+### 5. userData split screen values → check existing funnel spec
+- If found → use same values (gender, palmReadingGoal, zodiac, etc.)
+- If not found → ask one field at a time
 
-Automation constants:
+### 6. responseCollectorRules → check existing funnel spec
+- If not found → use default: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, W2A_LINK
 
-```
-funnelSubscriptions: defaultTrial1() / defaultTrial5() / ...
-FunnelEmailSubject: PALMISTRY_READINGS / ...
-ReadingEmailButton: GET_PALMISTRY_READING / ...
-ScanSource: FILE
-responseCollectorRules: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, W2A_LINK
-```
+---
 
-## What to Remove from Cases
+## Steps Format Rules
 
-### Steps with random answers
-**Replace** a detailed list of screens "Select answer on /screenA → /screenB → /screenC" (where the answer does not affect the flow) **with a single step:**
+### Collapse random screens
+Replace detailed listing of screens where any answer works with a single step:
 > "Go through all quiz screens by selecting any available answers"
 
-**Keep** specific values for split screens:
-- Screens where the answer affects the next screen (branching)
-- Screens where the answer is displayed later (e.g. goal on onboarding)
-- `/gender`, `/palmReadingGoal`, `/decisionsSingle`
+### Keep explicit values for split screens
+Screens where the answer affects flow or is shown later — always specify:
+- /gender → Female / Male
+- /palmReadingGoal → intellect_decision / other
+- Any other screen listed in userData
 
-## Step Structure (custom_steps_separated)
+### Preconditions — required fields
+- Funnel URL (appnebula.co)
+- User has EU locale
+- Test data: gender, date (+ zodiac sign), split screen values
+- Scan source: FILE / CAMERA
+- EU subscription: X EUR trial / Y EUR after Z-day trial
+- For e2e: Chrome mobile | For manual: Chrome desktop
 
-```json
-{
-  "content": "<p>Step description</p>",
-  "expected": "<p>Expected result</p>",
-  "additional_info": "",
-  "refs": ""
-}
+### Automation Notes — ALWAYS add as the last step
+```html
+<p><strong>🤖 Automation Notes</strong></p>
+<ul>
+  <li>funnelSubscriptions.{function}() → X EUR / Y EUR, Z-day trial</li>
+  <li>ReadingEmailButton.{CONSTANT} = '{button text}'</li>
+  <li>FunnelEmailSubject.{CONSTANT} = '{subject}' [або ⚠️ needs to be added to email.ts]</li>
+  <li>ScanSource: FILE / CAMERA</li>
+  <li>userData: { gender, date, splitField, zodiac }</li>
+  <li>responseCollectorRules: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, [BING_ANALYTICS,] W2A_LINK</li>
+</ul>
 ```
 
-## Do
+---
 
-- Always retrieve the existing case before updating (`get_case`)
-- Keep all `shared_step_id` steps unchanged
-- Specify exact values for split screens
-- Add Automation Notes to every case
+## Shared Steps
+Reference each shared step only ONCE — TestRail auto-expands all sub-steps:
+```json
+{"shared_step_id": 17}
+{"shared_step_id": 74}
+```
+Never duplicate.
 
-## Don't
+---
 
-- Do not remove steps with email verification (even "click on buttons")
-- Do not remove steps with mobile app checks (manual-only, but keep them)
-- Do not change `template_id`, `type_id`, `priority_id`
-- Do not remove UI checks (scroll, zodiac display) — they are for manual testing
+## Case Fields (add_case / update_case)
+```
+template_id: 2
+type_id: 6
+priority_id: 4
+custom_regression: true
+custom_smoke: false
+custom_isabtest: false
+custom_automation_status: 3
+custom_completion_status: 4
+custom_case_platform_dropdown: 4
+```
+
+---
+
+## DO
+- Always add "(AI generated)" to the title of every case you create or update
+- If README.md exists in the project — update it with AI-generated convention
+- Look up in code first, ask only if missing
+- Ask ONE question at a time
+- Always confirm ReadingEmailButton with user
+- Always add Automation Notes as last step
+- Always get_case before update_case
+
+## DON'T
+- Don't omit "(AI generated)" from the title
+- Don't ask about subscription if it exists in subscription.ts
+- Don't ask all questions at once
+- Don't skip Automation Notes
+- Don't duplicate shared steps

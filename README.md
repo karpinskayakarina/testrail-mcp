@@ -93,6 +93,17 @@ Nebula (project_id: 6)
         └── ...
 ```
 
+## AI-Generated Test Cases
+
+Test cases created or improved by AI agents are marked with **(AI generated)** at the end of the title.
+
+Example: `"Check successful payments for user with EU locale and email check (AI generated)"`
+
+These cases follow the structured format defined in `.claude/rules/testrail-funnel-test-cases.md`:
+- Preconditions include funnel URL, locale, test data (gender, date, zodiac), and subscription details
+- Steps use `custom_steps_separated` with explicit values for split screens
+- Every case ends with an **🤖 Automation Notes** step containing constants for subscription, email subject, button text, scan source, userData, and responseCollectorRules
+
 ## Rules for Agents
 
 See `.claude/rules/testrail-funnel-test-cases.md` for detailed rules on creating and updating funnel test cases.
