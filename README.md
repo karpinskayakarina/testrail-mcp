@@ -100,21 +100,39 @@ custom_steps_separated: [
 
 ```
 Nebula (project_id: 6)
-├── Mobile: iOS (suite_id: 136)                  [planned]
-├── Mobile: Android (suite_id: 137)              [planned]
-├── AskNebula (suite_id: 170)                    [planned]
+├── Mobile: iOS (suite_id: 136)                  [planned — sections TBD]
+├── Mobile: Android (suite_id: 137)              [planned — sections TBD]
+├── AskNebula (suite_id: 170)                    [planned — sections TBD]
 ├── Funnels (suite_id: 486)                      [active]
 │   ├── Quiz funnels (section_id: 8694)
-│   │   ├── Registration catalogue
-│   │   ├── Simple registration
-│   │   └── ...
+│   │   ├── Registration catalogue (section_id: 8696)
+│   │   ├── Simple registration (section_id: 8698)
+│   │   ├── Simple registration tarot (section_id: 24370)
+│   │   ├── Simple registration tiktok (section_id: 24405)
+│   │   ├── Simple simple registration (section_id: 8699)
+│   │   ├── Expert catalogue landing (section_id: 8700)
+│   │   └── Additional checks (section_id: 14756)
 │   └── AppNebula Funnels (section_id: 8648)
 │       ├── Aura (section_id: 36639)
 │       ├── Soulmate-sketch (section_id: 36637)
+│       ├── Witch power (section_id: 8703)
+│       ├── Marriage Compatibility (section_id: 15345)
+│       ├── Child Prediction (section_id: 41980)
+│       ├── Past Life (section_id: 15136)
+│       ├── Starseed (section_id: 8722)
+│       ├── Natal chart (section_id: 8711)
 │       ├── Palmistry (section_id: 8707)
+│       ├── Soul Connection (section_id: 14070)
+│       ├── Spirit animal (section_id: 8718)
+│       ├── Shamans (section_id: 8706)
+│       ├── Moon compatibility (section_id: 8710)
+│       ├── Feminine archetypes (section_id: 8716)
+│       ├── Male archetypes (section_id: 8861)
+│       ├── Ex-compatibility (section_id: 60509)
+│       ├── Empath (section_id: 15138)
 │       ├── birth-chart-calculator (section_id: 61057)
-│       └── ...
-└── API (suite_id: 1660)                         [planned]
+│       └── Funnel Common Checks (section_id: 49665)
+└── API (suite_id: 1660)                         [planned — sections TBD]
 ```
 
 ## AI-Generated Test Cases
@@ -142,7 +160,7 @@ See `.claude/skills/` for full skill definitions.
 
 ## Rules for Agents
 
-See `.claude/rules/testrail-funnel-test-cases.md` for detailed rules on creating and updating funnel test cases.
+See `.claude/rules/testrail-funnels-suite.md` for detailed rules on creating and updating funnel test cases.
 
 ## Local Development
 

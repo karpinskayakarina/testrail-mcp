@@ -9,7 +9,7 @@ Update an existing funnel test case in TestRail to match the current standard fo
 
 1. Ask the user which test case to update (title or case ID) — ONE question.
 2. Call `get_case` to retrieve the current state.
-3. Identify what is missing or outdated compared to `.claude/rules/testrail-funnel-test-cases.md`:
+3. Identify what is missing or outdated compared to `.claude/rules/testrail-funnels-suite.md`:
    - Preconditions use the structured HTML template with `<strong>` values
    - Steps collapse random quiz screens into one step
    - Split screens (gender, palmReadingGoal, etc.) have explicit `<strong>` values

@@ -37,10 +37,14 @@ module.exports = function registerCases(server, client) {
     try { return ok(await client.getCase(case_id)); } catch (e) { return err(e); }
   });
 
-  server.tool('get_cases', 'Get test cases for a project with optional filters', {
-    project_id: z.number().int().positive().describe('Project ID'),
-    suite_id: z.number().int().positive().optional().describe('Suite ID'),
-    section_id: z.number().int().positive().optional().describe('Section ID'),
+  server.tool('get_cases',
+    'Get test cases for a project with optional filters. ' +
+    'For Funnels: project_id=6, suite_id=486. ' +
+    'For AppNebula Funnels: section_id=8648. For Quiz funnels: section_id=8694. ' +
+    'Use limit=1 first to verify access before fetching all cases.', {
+    project_id: z.number().int().positive().describe('Project ID. Nebula = 6'),
+    suite_id: z.number().int().positive().optional().describe('Suite ID. Funnels suite = 486'),
+    section_id: z.number().int().positive().optional().describe('Section ID. AppNebula Funnels = 8648, Quiz funnels = 8694'),
     type_id: z.number().int().positive().optional().describe('Case type ID'),
     priority_id: z.number().int().positive().optional().describe('Priority ID'),
     milestone_id: z.number().int().positive().optional().describe('Milestone ID'),
@@ -50,11 +54,16 @@ module.exports = function registerCases(server, client) {
     try { return ok(await client.getCases(project_id, params)); } catch (e) { return err(e); }
   });
 
-  server.tool('add_case', 'Create a new test case in a section. For funnel cases use custom_steps_separated (not custom_steps).', {
-    section_id: z.number().int().positive().describe('Section ID'),
-    title: z.string().describe('Test case title'),
-    type_id: z.number().int().positive().optional().describe('Case type ID'),
-    priority_id: z.number().int().positive().optional().describe('Priority ID'),
+  server.tool('add_case',
+    'Create a new test case in a section. ' +
+    'For Funnels (suite_id=486): section_id must be a funnel subsection under AppNebula Funnels (parent_id=8648) or Quiz funnels (parent_id=8694). ' +
+    'Use custom_steps_separated (not custom_steps) for funnel cases (template_id=2). ' +
+    'Always add "(AI generated)" to the title. ' +
+    'Do NOT use for Mobile: iOS/Android (suite 136/137), AskNebula (suite 170), or API (suite 1660).', {
+    section_id: z.number().int().positive().describe('Section ID of the funnel (child of AppNebula Funnels 8648 or Quiz funnels 8694)'),
+    title: z.string().describe('Test case title. Must end with "(AI generated)"'),
+    type_id: z.number().int().positive().optional().describe('Case type ID. Funnel default = 6'),
+    priority_id: z.number().int().positive().optional().describe('Priority ID. Funnel default = 4'),
     estimate: z.string().optional().describe('Estimated duration, e.g. "10min"'),
     milestone_id: z.number().int().positive().optional().describe('Milestone ID'),
     refs: z.string().optional().describe('Comma-separated reference IDs (e.g. Jira ticket keys)'),
@@ -67,11 +76,15 @@ module.exports = function registerCases(server, client) {
     } catch (e) { return err(e); }
   });
 
-  server.tool('update_case', 'Update an existing test case. Always call get_case first to preserve shared_step_id steps and avoid overwriting them.', {
+  server.tool('update_case',
+    'Update an existing test case. ' +
+    'ALWAYS call get_case first to read current state and preserve shared_step_id steps. ' +
+    'For Funnels: do not change type_id (6), priority_id (4), or template_id (2). ' +
+    'Add "(AI generated)" to title if not already present.',  {
     case_id: z.number().int().positive().describe('Test case ID'),
-    title: z.string().optional().describe('New title'),
-    type_id: z.number().int().positive().optional().describe('Case type ID — do not change for funnel cases'),
-    priority_id: z.number().int().positive().optional().describe('Priority ID — do not change for funnel cases'),
+    title: z.string().optional().describe('Title. Must end with "(AI generated)"'),
+    type_id: z.number().int().positive().optional().describe('Case type ID — do not change for funnel cases (default: 6)'),
+    priority_id: z.number().int().positive().optional().describe('Priority ID — do not change for funnel cases (default: 4)'),
     estimate: z.string().optional().describe('New estimate'),
     milestone_id: z.number().int().positive().optional().describe('New milestone ID'),
     refs: z.string().optional().describe('New reference IDs'),

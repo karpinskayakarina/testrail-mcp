@@ -23,7 +23,7 @@ Create a complete set of test cases for a new funnel in TestRail.
 
 ## Instructions
 
-1. Ask: "Для якої воронки створюємо повний комплект?" — then ask remaining required questions ONE AT A TIME per `.claude/rules/testrail-funnel-test-cases.md`:
+1. Ask: "Для якої воронки створюємо повний комплект?" — then ask remaining required questions ONE AT A TIME per `.claude/rules/testrail-funnels-suite.md`:
    - Funnel name (slug)
    - Report types
    - Photo scan (yes/no) → scan type → scan source (skip case #6 if no scan)
@@ -37,7 +37,7 @@ Create a complete set of test cases for a new funnel in TestRail.
 2. Check if section already exists using `get_sections` (project_id: 6, suite_id: 486).
    - If not → create it with `add_section` (parent_id: 8648).
 
-3. Create all applicable cases one by one using `add_case`, following the format in `.claude/rules/testrail-funnel-test-cases.md`:
+3. Create all applicable cases one by one using `add_case`, following the format in `.claude/rules/testrail-funnels-suite.md`:
    - Preconditions: structured HTML with `<strong>` values, clickable URL, zodiac inferred from date
    - Steps: collapsed quiz with explicit split values, shared_step_id 17 then 74
    - Last step: Automation Notes
