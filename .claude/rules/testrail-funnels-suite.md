@@ -209,9 +209,12 @@ custom_regression: true
 custom_smoke: false
 custom_isabtest: false
 custom_automation_status: 3
-custom_completion_status: 4
+custom_completion_status: 2
 custom_case_platform_dropdown: 4
 ```
+
+Note: `custom_completion_status` is the "Writing status *" field in TestRail UI.
+Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 
 ---
 
