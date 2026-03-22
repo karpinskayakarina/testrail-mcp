@@ -17,21 +17,31 @@ type: reference
 
 ## Standard Full Set of Test Cases
 
-Based on the Aura funnel. All titles must end with "(AI generated)".
+10 cases per funnel. All titles must end with "(AI generated)".
 
 | # | Title | Condition |
 |---|-------|-----------|
 | 1 | Check successful payments for user with EU locale and email check | Always |
-| 2 | Check successful payments for user with USA locale | Always |
-| 3 | Check flow for user with EU locale with subscription payment error | Always |
-| 4 | Check flow for user with EU locale with additional discount payment | Always |
+| 2 | Check successful subscription payment for user with USA locale | Always |
+| 3 | Check flow for user with EU localization with subscription payment error | Always |
+| 4 | Check flow for user with EU localization with additional discount payment | Always |
 | 5 | Check flow for user with USA locale with error on upsell payments | Always |
-| 6 | Verify funnel flow with failed scan for EU users | Only if scan exists |
+| 6 | Verify funnel flow with failed {scan type} scan for EU users | Only if scan exists |
 | 7 | Check flow for user with re-entering card after incorrect upsells payment | Always |
-| 8 | Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Always |
-| 9 | Check successful subscription flows on LATAM localizations | Always |
-| 10 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Always |
-| 11 | Check successful payments on landing | Always |
+| 8 | Check successful subscription flows on LATAM localizations | Always |
+| 9 | Check email marketing landing flow for EU user with email check | Always |
+| 10 | Check email marketing paywall flow for EU user with email check | Always |
+
+### Cases NOT in the standard per-funnel set
+
+| Title | Note |
+|-------|------|
+| Check flow for user with EU locale with resign form on payments | Automated once — only in section 49665 |
+| Check flow for user re-entering the funnel with already active subscription on UK locale | Automated once — only in section 49665 |
+| Check flow for user re-entering another funnel with already active subscription on US locale | Automated once — only in section 49665 |
+| Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Component-level automation only — not per-funnel |
+| Check flow for user re-entering the funnel after subscription cancellation | Still being groomed |
+| Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Manual only — no e2e automation |
 
 ---
 
