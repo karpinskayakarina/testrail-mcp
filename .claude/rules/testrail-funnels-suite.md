@@ -39,7 +39,7 @@ type: reference
 | Check flow for user with EU locale with resign form on payments | Automated once — only in section 49665 |
 | Check flow for user re-entering the funnel with already active subscription on UK locale | Automated once — only in section 49665 |
 | Check flow for user re-entering another funnel with already active subscription on US locale | Automated once — only in section 49665 |
-| Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Component-level automation only — not per-funnel |
+| Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Component-level automation only — not per-funnel. Always set `custom_automation_status: 4` (Won't automate) |
 | Check flow for user re-entering the funnel after subscription cancellation | Still being groomed |
 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Manual only — no e2e automation |
 
