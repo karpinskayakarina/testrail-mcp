@@ -260,3 +260,4 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Don't use `custom_completion_status: 4` (Done) for new cases — use 2 (Ready for review)
 - Don't repeat in steps any value already present in preconditions
 - Don't write funnel-specific screen names, prices, or enum values inside step content
+- Don't add a "Check paywall content" step — paywall content checks are covered by automation rules
