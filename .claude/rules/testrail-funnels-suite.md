@@ -129,7 +129,7 @@ Use this exact structure (see case 418133 as reference):
 <ul>
   <li>Gender: <strong>Female</strong></li>
   <li>Date of birth: <strong>Jun 28 1996</strong> (Zodiac: Cancer)</li>
-  <li>palmReadingGoal: <strong>intellect_decision</strong></li>
+  <li>palmReadingGoal: <strong>Intellect decision</strong></li>
   <li>Scan source: <strong>FILE</strong> (upload from gallery, not camera)</li>
   <li>EU subscription: <strong>1 EUR</strong> trial / <strong>42.99 EUR</strong> per month after 7-day trial</li>
 </ul>
@@ -142,44 +142,46 @@ Key rules:
 - Zodiac sign must be inferred from the date and included in parentheses
 - Scan source must specify FILE or CAMERA with explanation
 - Subscription must include trial price, recurring price, trial duration, and period
+- Use human-readable UI text for values — NOT code enums (e.g. `Intellect decision`, not `intellect_decision`)
 
 ---
 
 ## Steps Format
 
-### General rules
-- Use `<strong>` for all explicit values (Female, intellect_decision, 1 EUR, Jun 28 1996, Cancer, FILE)
+### Core principles
+- **All custom/funnel-specific data belongs in Preconditions (Test data), not in steps**
+- **Steps must be maximally unified — reusable across all funnels without modification**
+- **No duplication: if a value is already in preconditions, do not repeat it in steps**
 - Use `<ul><li>` for grouped sub-steps within one step
 - Wrap all content and expected in `<p>` tags
 
-### Step structure for quiz screens
-Collapse random screens into one step, but explicitly call out split screens within it:
+### Step structure
 
+Steps describe only the **branching from the standard success flow**. The standard success flow itself is not described in steps — it is covered by Step 0.
+
+**Step 0 — always the first step for non-success-flow cases:**
 ```html
 <!-- content -->
-<p>Go through all quiz screens by selecting any available answers:</p>
+<p>Go through the full funnel flow up to the paywall using test data from preconditions</p>
 <ul>
-  <li>Select any answer on /primaryHandUsage → /palmReadingGoal</li>
-  <li>Select <strong>intellect_decision</strong> on /palmReadingGoal → /goalSetup</li>
-  <li>Click Next on /goalSetup → /date</li>
-  <li>Enter date <strong>Jun 28 1996</strong> on /date → continue quiz</li>
-  <li>Go through remaining screens by selecting any available answers → /loadingRelationship</li>
-  <li>Check zodiac <strong>Cancer</strong> on /loadingRelationship</li>
-  <li>Select any answer on /decisionsSingle → /scanPreview</li>
+  <li>For split screens — select answers specified in test data</li>
+  <li>For all other screens — select any available answer</li>
 </ul>
 
 <!-- expected -->
-<p>All screens load correctly; Amplitude events present; zodiac <strong>Cancer</strong> displayed for Jun 28 1996; user redirected to /scanPreview</p>
+<p>User reaches the paywall</p>
 ```
 
-### Scan step *(if scan exists)*
-```html
-<!-- content -->
-<p>Upload a valid hand photo from gallery (<strong>FILE upload, not camera</strong>) on /scanPreview</p>
+This step is identical across all funnels — never modify its wording.
 
-<!-- expected -->
-<p>Hand scan passes validation successfully; user redirected to /email</p>
-```
+**Subsequent steps — only the deviation/branch logic:**
+- Describe what happens at the branching point (e.g. payment fails, scan fails, upsell error)
+- Do NOT repeat test data values from preconditions inline in steps
+- Keep wording generic enough to apply to any funnel
+
+**Success flow cases** (no branching): steps = `[]` — all data is in preconditions, nothing to describe in steps.
+
+> **Note:** All test data and funnel-specific information must be collected during case creation via the Required Questions checklist (see above). By the time steps are written, everything specific is already in Preconditions.
 
 ### Shared Steps
 Reference shared steps by ID only — TestRail auto-expands sub-steps. Never duplicate content.
@@ -188,25 +190,6 @@ Reference shared steps by ID only — TestRail auto-expands sub-steps. Never dup
 |----------------|----------------|
 | 17 | Post-payment onboarding screens + Web2App screen |
 | 74 | Full email flow (welcome, reading ready, app install, reading email, login/password) |
-
-Always include both in the correct order: `17` first, then `74`.
-
-### Automation Notes — ALWAYS last step
-```html
-<!-- content -->
-<p><strong>🤖 Automation Notes</strong></p>
-<ul>
-  <li>funnelSubscriptions.defaultTrial1() → 1 EUR / 42.99 EUR, 7-day trial, 30-day period</li>
-  <li>ReadingEmailButton.GET_MY_READING = 'Get my Reading'</li>
-  <li>FunnelEmailSubject.PALMISTRY_READINGS = '🔮 Get your Palmistry Reading' [або ⚠️ needs to be added to email.ts]</li>
-  <li>ScanSource: FILE (upload from gallery, not camera)</li>
-  <li>userData: { gender: UserGender.FEMALE, date: '1996-06-28', palmReadingGoal: 'intellect_decision', zodiac: ZodiacTypes.CANCER }</li>
-  <li>responseCollectorRules: FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, BING_ANALYTICS, W2A_LINK</li>
-</ul>
-
-<!-- expected -->
-<p>-</p>
-```
 
 ---
 
@@ -230,16 +213,17 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 
 ## DO
 - Always add "(AI generated)" to the title
-- Always use `<strong>` for explicit values in steps and preconditions
+- Always use `<strong>` for explicit values in preconditions test data
 - Always include zodiac sign inferred from date of birth
-- Always reference shared_step_id 17 and 74 (in this order) — never write their content manually
-- Always add Automation Notes as the very last step
 - Always get_case before update_case to preserve shared_step_id steps
 - **Before creating OR updating any case: go through the Required Questions checklist. Check code first, ask only what's missing — one question at a time.**
 - Look up in code first, ask only if missing
 - Ask ONE question at a time
 - Always confirm ReadingEmailButton with user — only if NOT found in code
 - Always set `custom_completion_status: 2` (Ready for review) for new AI-generated cases
+- Keep all funnel-specific values (prices, gender, dates, scan type, etc.) in Preconditions test data only
+- Keep steps universal — reusable across funnels without modification
+- For success flow cases: use empty steps `[]`
 
 ## DON'T
 - Don't omit "(AI generated)" from the title
@@ -247,6 +231,8 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Don't duplicate shared steps
 - Don't ask about subscription if it exists in subscription.ts
 - Don't ask all questions at once
-- Don't skip Automation Notes
+- Don't add Automation Notes step
 - Don't change template_id, type_id, priority_id
 - Don't use `custom_completion_status: 4` (Done) for new cases — use 2 (Ready for review)
+- Don't repeat in steps any value already present in preconditions
+- Don't write funnel-specific screen names, prices, or enum values inside step content
