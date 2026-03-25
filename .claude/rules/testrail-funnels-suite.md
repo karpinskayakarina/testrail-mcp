@@ -45,6 +45,28 @@ type: reference
 
 ---
 
+## Standard Steps per Case Type
+
+### Case 1 — Check successful payments for user with EU locale and email check
+
+```
+Step 0: Go through the full funnel flow using test data from preconditions
+        → Payment is successful; user proceeds to post-payment flow
+
+Step 1: Verify post-payment state:
+        - Check that the reading email contains the button specified in test data
+        - Check in AskNebula that the user is assigned to the funnel they completed
+        - Check that the subscription is activated for the user
+        - Check that the reading type from test data appeared in the system
+        →
+        - Email button text matches test data
+        - User belongs to the correct funnel in AskNebula
+        - Subscription is active
+        - Reading type is available in the system as per test data
+```
+
+---
+
 ## Naming Convention
 All test cases created or updated by AI MUST have "(AI generated)" at the end of the title.
 Example: `"Check successful payments for user with EU locale and email check (AI generated)"`
@@ -127,6 +149,7 @@ Use this exact structure (see case 418133 as reference):
 <p>User has EU locale</p>
 <p><strong>Test data:</strong></p>
 <ul>
+  <li>Accept cookies (EU locale)</li>
   <li>Gender: <strong>Female</strong></li>
   <li>Date of birth: <strong>Jun 28 1996</strong> (Zodiac: Cancer)</li>
   <li>palmReadingGoal: <strong>Intellect decision</strong></li>
@@ -143,6 +166,7 @@ Key rules:
 - Scan source must specify FILE or CAMERA with explanation
 - Subscription must include trial price, recurring price, trial duration, and period
 - Use human-readable UI text for values — NOT code enums (e.g. `Intellect decision`, not `intellect_decision`)
+- **EU locale cases** must always include `Accept cookies (EU locale)` as the first item in test data
 
 ---
 
