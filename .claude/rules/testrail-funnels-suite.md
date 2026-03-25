@@ -183,13 +183,14 @@ Use this exact structure (see case 418133 as reference):
 ```
 
 Key rules:
-- Funnel URL must be a clickable `<a>` link
+- Funnel URL must be a clickable `<a>` link — always use `appnebula.co` domain, never `nebula-palmistry.com`
 - All specific values (gender, date, goal, price) must be wrapped in `<strong>`
 - Zodiac sign must be inferred from the date and included in parentheses
 - Scan source must specify FILE or CAMERA with explanation
 - Subscription must include trial price, recurring price, trial duration, and period
 - Use human-readable UI text for values — NOT code enums (e.g. `Intellect decision`, not `intellect_decision`)
 - **EU locale cases** must always include `Accept cookies (EU locale)` as the first item in test data
+- **Cases with a prerequisite** must include a `Precondition:` line (not "Prerequisite") referencing the case number of "Check successful payments for user with EU locale and email check" from the **same funnel section** (e.g. `Precondition: User has completed C418133 and has an active subscription`)
 
 ---
 
