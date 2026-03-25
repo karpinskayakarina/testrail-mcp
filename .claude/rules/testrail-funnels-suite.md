@@ -102,6 +102,94 @@ Step 2: Wait 1 minute and check that the email marketing email has arrived;
 Step 3: Verify post-payment state (see reusable step above)
 ```
 
+### Case 2 — Check successful subscription payment for user with USA locale
+
+Same step structure as Case 1. USA locale precondition differences:
+- No `Accept cookies` item
+- Add behavioral notes: `No cookie banner (USA locale)`, `Agreement consent checkbox on /gender: required`, `No /emailConfirm screen`
+- For manual tests: **Safari** browser (not Chrome)
+- Post-payment verification: same as Case 1 (includes email button check)
+
+### Case 3 — Check flow for user with EU localization with subscription payment error
+
+```
+Step 1: Go through the full funnel flow up to the paywall using test data from preconditions
+        → User reaches the paywall
+
+Step 2: Attempt payment with an invalid/declined card
+        → Payment is NOT successful — error is displayed; user remains on paywall
+```
+No post-payment verification — payment does not succeed.
+
+### Case 5 — Check flow for user with USA locale with error on upsell payments
+
+```
+Step 1: Go through the full funnel flow up to the paywall using test data from preconditions
+        → User reaches the paywall
+
+Step 2: Complete main subscription payment with a valid card (insufficient funds for recurring payments)
+        → Payment is successful; user is redirected to upsell page
+
+Step 3: Attempt upsell payment — fails; skip upsell offer
+        → Recurring payment error is displayed; price is in USD; user is navigated to consultation page
+
+Step 4: Attempt "Get my consultation" payment — fails; skip upsell offer
+        → Recurring payment error is displayed; price is in USD; user proceeds to post-payment flow
+
+Step 5: Verify post-payment state (omit email button check — USA upsell error flow)
+```
+
+### Case 6 — Verify funnel flow with failed {scan type} scan for EU users
+
+> **Important:** Step 0 goes up to the **scan screen** (not paywall) — branching happens at the scan stage.
+
+```
+Step 1: Go through the full funnel flow up to the scan screen using test data from preconditions
+        → User reaches the scan screen
+
+Step 2: Upload an invalid photo — scan fails; click "Try again"; upload a valid photo — scan passes
+        → Error screen is displayed on first attempt; scan passes on second attempt; user proceeds to paywall
+
+Step 3: Complete payment with a valid card
+        → Payment is successful; user proceeds to post-payment flow
+
+Step 4: Verify post-payment state (omit email button check)
+```
+
+### Case 7 — Check flow for user with re-entering card after incorrect upsells payment
+
+```
+Step 1: Go through the full funnel flow up to the paywall using test data from preconditions
+        → User reaches the paywall
+
+Step 2: Complete main subscription payment with a valid card (insufficient funds for recurring payments)
+        → Payment is successful; user is redirected to upsell page
+
+Step 3: Attempt upsell payment — fails; skip upsell offer
+        → Recurring payment error is displayed; user is navigated to consultation page
+
+Step 4: Attempt "Get my consultation" payment — fails; click "Try again" and re-enter a valid card
+        → Recurring payment error is displayed; after re-entering valid card payment is successful; user proceeds to post-payment flow
+
+Step 5: Verify post-payment state (omit email button check)
+```
+
+### Case 8 — Check successful subscription flows on LATAM localizations
+
+Same step structure as Case 1, but post-payment verification **omits email button check** (no email marketing flow for LATAM). No `Accept cookies` in preconditions.
+
+### Case — Check flow for user re-entering the funnel after subscription cancellation (C425053)
+
+```
+Step 1: Cancel the user's subscription via API using the email from preconditions case
+        → Subscription is cancelled
+
+Step 2: Re-open the funnel and enter the email from preconditions on the email screen; proceed to paywall; complete payment
+        → Payment is successful; user proceeds to post-payment flow
+
+Step 3: Verify post-payment state
+```
+
 ### Case 4 — Check flow for user with EU localization with additional discount payment
 
 ```
