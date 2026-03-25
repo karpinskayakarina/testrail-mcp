@@ -73,6 +73,35 @@ Step 0: Go through the full funnel flow using test data from preconditions
 Step 1: Verify post-payment state (see reusable step above)
 ```
 
+### Case 9 — Check email marketing landing flow for EU user with email check
+
+```
+Step 1: Go through the full funnel flow up to the email screen using test data from preconditions
+        → Funnel ends at the email screen; email is saved with order_id
+
+Step 2: Open the email marketing landing page using the order_id from Step 1
+        (https://appnebula.co/email-marketing-{funnel name}/landing?order_id=<order_id>);
+        go through the landing flow and complete payment
+        → Payment is successful (0 EUR); user proceeds to post-payment flow
+
+Step 3: Verify post-payment state (see reusable step above)
+```
+
+### Case 10 — Check email marketing paywall flow for EU user with email check
+
+```
+Step 1: Go through the full funnel flow; enter email and give consent to email marketing
+        on the email confirmation screen
+        → Funnel ends at the email screen; email entered and consent given
+
+Step 2: Wait 1 minute and check that the email marketing email has arrived;
+        follow the link from the email to the paywall and complete payment
+        → Email marketing email arrives within 1 minute; payment is successful;
+          user proceeds to post-payment flow
+
+Step 3: Verify post-payment state (see reusable step above)
+```
+
 ### Case 4 — Check flow for user with EU localization with additional discount payment
 
 ```
