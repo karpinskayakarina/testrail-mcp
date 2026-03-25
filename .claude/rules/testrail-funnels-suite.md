@@ -47,22 +47,45 @@ type: reference
 
 ## Standard Steps per Case Type
 
+### Post-payment verification step (reusable)
+
+Any case that ends with a successful payment must include this as the last step:
+
+```
+Verify post-payment state:
+- Check that the reading email contains the button specified in test data
+- Check in AskNebula that the user is assigned to the funnel they completed
+- Check that the subscription is activated for the user
+- Check that the reading type from test data appeared in the system
+→
+- Email button text matches test data
+- User belongs to the correct funnel in AskNebula
+- Subscription is active
+- Reading type is available in the system as per test data
+```
+
 ### Case 1 — Check successful payments for user with EU locale and email check
 
 ```
 Step 0: Go through the full funnel flow using test data from preconditions
         → Payment is successful; user proceeds to post-payment flow
 
-Step 1: Verify post-payment state:
-        - Check that the reading email contains the button specified in test data
-        - Check in AskNebula that the user is assigned to the funnel they completed
-        - Check that the subscription is activated for the user
-        - Check that the reading type from test data appeared in the system
-        →
-        - Email button text matches test data
-        - User belongs to the correct funnel in AskNebula
-        - Subscription is active
-        - Reading type is available in the system as per test data
+Step 1: Verify post-payment state (see reusable step above)
+```
+
+### Case 4 — Check flow for user with EU localization with additional discount payment
+
+```
+Step 0: Go through the full funnel flow up to the paywall using test data from preconditions
+        → User reaches the paywall
+
+Step 1: Attempt payment with a declined card (insufficient funds)
+        → Payment is NOT successful — error is displayed; additionalDiscount page appears
+
+Step 2: Click "Get secret discount" on the additionalDiscount page, then complete payment on the discount paywall
+        → Payment is successful; user proceeds to post-payment flow
+
+Step 3: Verify post-payment state (see reusable step above)
 ```
 
 ---
