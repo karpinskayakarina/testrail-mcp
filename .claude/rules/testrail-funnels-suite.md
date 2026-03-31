@@ -17,7 +17,7 @@ type: reference
 
 ## Standard Full Set of Test Cases
 
-10 cases per funnel. All titles must end with "(AI generated)".
+12 cases per funnel. All titles must end with "(AI generated)".
 
 | # | Title | Condition |
 |---|-------|-----------|
@@ -31,6 +31,8 @@ type: reference
 | 8 | Check successful subscription flows on LATAM localizations | Always |
 | 9 | Check email marketing landing flow for EU user with email check | Always |
 | 10 | Check email marketing paywall flow for EU user with email check | Always |
+| 11 | Check flow with successful payments for user with USA locale when timer has expired and email check | Always — set `custom_automation_status: 4` (Won't automate) |
+| 12 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Always — set `custom_automation_status: 4` (Won't automate), manual only |
 
 ### Cases NOT in the standard per-funnel set
 
@@ -39,9 +41,6 @@ type: reference
 | Check flow for user with EU locale with resign form on payments | Automated once — only in section 49665 |
 | Check flow for user re-entering the funnel with already active subscription on UK locale | Automated once — only in section 49665 |
 | Check flow for user re-entering another funnel with already active subscription on US locale | Automated once — only in section 49665 |
-| Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Component-level automation only — not per-funnel. Always set `custom_automation_status: 4` (Won't automate) |
-| Check flow for user re-entering the funnel after subscription cancellation | Still being groomed |
-| Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Manual only — no e2e automation |
 
 ---
 
@@ -178,18 +177,6 @@ Step 5: Verify post-payment state (omit email button check)
 
 Same step structure as Case 1, but post-payment verification **omits email button check** (no email marketing flow for LATAM). No `Accept cookies` in preconditions.
 
-### Case — Check flow for user re-entering the funnel after subscription cancellation (C425053)
-
-```
-Step 1: Cancel the user's subscription via API using the email from preconditions case
-        → Subscription is cancelled
-
-Step 2: Re-open the funnel and enter the email from preconditions on the email screen; proceed to paywall; complete payment
-        → Payment is successful; user proceeds to post-payment flow
-
-Step 3: Verify post-payment state
-```
-
 ### Case 4 — Check flow for user with EU localization with additional discount payment
 
 ```
@@ -220,7 +207,7 @@ Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT
 ### Required Questions (in order)
 
 **1. Funnel name**
-- Confirm the slug (e.g. `palmistry`, `aura`, `birth-chart-calculator`)
+- Confirm the funnel name (e.g. `palmistry`, `aura`, `birth-chart-calculator`)
 
 **2. Report types**
 - Suggest based on funnel name (e.g. `aura` → `ReportType.AURA`)
@@ -285,7 +272,7 @@ Use this exact structure (see case 418133 as reference):
 
 ```html
 <p>Funnel and its default flow is activated in Funnel builder</p>
-<p>Domain appnebula.co → <a href="https://appnebula.co/{slug}/prelanding">https://appnebula.co/{slug}/prelanding</a></p>
+<p>Domain appnebula.co → <a href="https://appnebula.co/{funnel name}/prelanding">https://appnebula.co/{funnel name}/prelanding</a></p>
 <p>User has EU locale</p>
 <p><strong>Test data:</strong></p>
 <ul>

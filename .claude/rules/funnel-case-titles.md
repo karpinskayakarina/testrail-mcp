@@ -1,9 +1,9 @@
 # Funnel Test Case — Standard Titles
 
 > **Scope:** AppNebula Funnels (suite 486). Titles are fixed across all funnels.
-> Source reference: Aura section (section_id: 36639). Steps from Aura are NOT a reference — titles only.
+> Source reference: Palmistry (AI generated), section_id: 62173.
 
-## Standard Set (10 cases per funnel)
+## Standard Set (12 cases per funnel)
 
 | # | Title | Condition |
 |---|-------|-----------|
@@ -17,6 +17,8 @@
 | 8 | Check successful subscription flows on LATAM localizations | Always |
 | 9 | Check email marketing landing flow for EU user with email check | Always |
 | 10 | Check email marketing paywall flow for EU user with email check | Always |
+| 11 | Check flow with successful payments for user with USA locale when timer has expired and email check | Always — `custom_automation_status: 4` (Won't automate) |
+| 12 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Always — `custom_automation_status: 4` (Won't automate), manual only |
 
 ## Title Rules
 
@@ -34,11 +36,7 @@
 | Check flow for user with EU locale with resign form on payments | Automated once — only in section 49665 |
 | Check flow for user re-entering the funnel with already active subscription on UK locale | Automated once — only in section 49665 |
 | Check flow for user re-entering another funnel with already active subscription on US locale | Automated once — only in section 49665 |
-| Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Component-level automation — not per-funnel |
-| Check flow for user re-entering the funnel after subscription cancellation | Still being groomed — not yet in use |
-| Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Manual only — no e2e automation planned |
 
 ## Notes
 
-- Aura case metadata (priority_id, platform dropdown) is **not** a reference — values vary inconsistently
 - For metadata, always copy from the reference case of the specific funnel (see update-funnels-case skill)
