@@ -21,8 +21,7 @@ Create a single new funnel test case in TestRail following the current standard 
 3. Find the correct section_id for the funnel using `get_sections` (project_id: 6, suite_id: 486).
 4. Build the case following the format in `.claude/rules/testrail-funnels-suite.md`:
    - Preconditions: structured HTML with `<strong>` values, clickable URL, zodiac inferred from date
-   - Steps: collapsed quiz, explicit split values, shared_step_id 17 then 74
-   - Last step: Automation Notes
+   - Steps: per-case structure from rules — no funnel-specific values in steps
    - Title ends with "(AI generated)"
 5. Call `add_case` with all required fields.
-6. Return the new case ID and TestRail URL.
+6. Return the new case ID.

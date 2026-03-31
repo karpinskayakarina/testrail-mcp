@@ -228,60 +228,51 @@ Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT
 **1. Funnel name**
 - Confirm the funnel name (e.g. `palmistry`, `aura`, `birth-chart-calculator`)
 
-**2. Report types**
-- Suggest based on funnel name (e.g. `aura` → `ReportType.AURA`)
-- Rule: if there is a hand scan → always include `ReportType.PALMISTRY`
-- Ask: "What readings does this funnel produce?"
-
-**3. Photo scan**
+**2. Photo scan**
 - Ask: "Is there a photo scan? (no / yes)"
 
-**4. Scan type** *(if scan = yes)*
+**3. Scan type** *(if scan = yes)*
 - Ask: "What type of scan? (hand scan / face scan)"
 
-**5. Scan source** *(if scan = yes)*
+**4. Scan source** *(if scan = yes)*
 - **Rule:** ScanSource: FILE — ONLY for "Verify funnel flow with failed scan" case. ALL other cases → CAMERA. Do NOT ask.
 
-**6. Email marketing**
+**5. Email marketing**
 - Ask: "Is there email marketing? (yes / no)"
 
-**7. Subscription price for successful payments test**
+**6. Subscription price for successful payments test**
 - Check `src/funnels/test-data/subscription.ts` first
 - If `funnelSubscriptions.defaultTrial1/5/9/13_67` or funnel-specific function exists → use it, do NOT ask
 - If not found → ask: "What is the subscription price for the successful payments test? (1$ / 5$ / 9$ / 13.67$)"
 
-**8. Subscription price for payment error test**
+**7. Subscription price for payment error test**
 - Same lookup logic — ask only if not found
 
-**9. Subscription price for additional discount test**
+**8. Subscription price for additional discount test**
 - Same lookup logic — ask only if not found
 
-**10. Subscription price for failed scan test** *(if scan = yes)*
+**9. Subscription price for failed scan test** *(if scan = yes)*
 - Default: 13.67$ — suggest and confirm
 - Ask: "What is the price for the failed scan test? (default 13.67$)"
 
-**11. Email subject**
+**10. Email subject**
 - Check `src/funnels/constants/email.ts` first
 - If not found → suggest based on pattern and confirm:
   - scan funnel → `'🔮 Get your {Funnel} and Palmistry Readings'`
   - no scan → `'🔮 Get your {Funnel Reading}'`
 - Ask: "Can you confirm the email subject: '{suggested}'?"
 
-**12. Email button text**
+**11. Email button text**
 - Check `src/funnels/constants/email.ts` first
 - If found → use it directly, do NOT ask
 - If not found → ask: "What is the email button text?"
 
-**13. Upsell** *(if applicable)*
+**12. Upsell** *(if applicable)*
 - Ask: "Is there an upsell? (no / ULTRA_PACK / CONSULTATION)"
 
-**14. userData fields** *(if not found in existing spec)*
+**13. userData fields** *(if not found in existing spec)*
 - Check `tests/funnels/` first
-- If not found → ask one field at a time: gender, zodiac, custom splits
-
-**15. responseCollectorRules**
-- Check existing funnel spec first
-- If not found → use default: `FUNNEL_USER, FACEBOOK_ANALYTICS, TIKTOK_ANALYTICS, W2A_LINK`
+- If not found → ask one field at a time: gender, date of birth, custom splits
 
 ---
 
@@ -353,14 +344,6 @@ This step is identical across all funnels — never modify its wording.
 **Success flow cases** (no branching): steps = `[]` — all data is in preconditions, nothing to describe in steps.
 
 > **Note:** All test data and funnel-specific information must be collected during case creation via the Required Questions checklist (see above). By the time steps are written, everything specific is already in Preconditions.
-
-### Shared Steps
-Reference shared steps by ID only — TestRail auto-expands sub-steps. Never duplicate content.
-
-| shared_step_id | What it covers |
-|----------------|----------------|
-| 17 | Post-payment onboarding screens + Web2App screen |
-| 74 | Full email flow (welcome, reading ready, app install, reading email, login/password) |
 
 ---
 

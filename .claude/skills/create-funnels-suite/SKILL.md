@@ -2,45 +2,49 @@
 
 > **Scope:** Funnels only — suite_id: 486 (AppNebula Funnels & Quiz funnels).
 > Do NOT use for Mobile: iOS/Android, AskNebula, or API suites.
+>
+> **Reference section:** Palmistry (AI generated), section_id: 62173 — use as the format reference for all cases.
 
-Create a complete set of test cases for a new funnel in TestRail.
-
-## Standard Set (based on Aura funnel)
-
-| # | Title | Condition |
-|---|-------|-----------|
-| 1 | Check successful payments for user with EU locale and email check | Always |
-| 2 | Check successful payments for user with USA locale | Always |
-| 3 | Check flow for user with EU locale with subscription payment error | Always |
-| 4 | Check flow for user with EU locale with additional discount payment | Always |
-| 5 | Check flow for user with USA locale with error on upsell payments | Always |
-| 6 | Verify funnel flow with failed scan for EU users | Only if scan exists |
-| 7 | Check flow for user with re-entering card after incorrect upsells payment | Always |
-| 8 | Check flow with successful payments with upsell for user with USA locale when timer has expired and email check | Always |
-| 9 | Check successful subscription flows on LATAM localizations | Always |
-| 10 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Always |
-| 11 | Check successful payments on landing | Always |
+Create a complete set of 12 standard test cases for a new funnel in TestRail.
 
 ## Instructions
 
-1. Ask: "Для якої воронки створюємо повний комплект?" — then ask remaining required questions ONE AT A TIME per `.claude/rules/testrail-funnels-suite.md`:
-   - Funnel name (slug)
-   - Report types
-   - Photo scan (yes/no) → scan type → scan source (skip case #6 if no scan)
-   - Email marketing (yes/no)
-   - Subscription prices: one question per test case type (EU successful, EU error, EU discount, USA successful, failed scan if applicable)
-   - Email subject (suggest, confirm)
-   - Email button text (always confirm)
-   - Upsell (if applicable)
-   - userData fields (gender, zodiac, splits)
+1. Ask: "For which funnel are we creating the full set?" — unless already provided as argument.
+2. Check if an old section for this funnel exists via `get_sections` (project_id: 6, suite_id: 486):
+   - **Old section exists** → fetch its cases with `get_cases` and extract from `custom_preconds`:
+     - All test data (prices, email subject/button, gender, date of birth, split values)
+     - `refs` from each case — copy to matching new case by case type
+     - `custom_automation_status` from each case — copy to matching new case by case type
+   - **No old section** → collect data via questions (step 3)
+3. Collect missing data ONE AT A TIME per `.claude/rules/testrail-funnels-suite.md` Required Questions:
+   - Funnel name, photo scan, scan type, email marketing
+   - Subscription prices (check `src/funnels/test-data/subscription.ts` first — ask only if not found)
+   - Email subject/button (check `src/funnels/constants/email.ts` first — ask only if not found)
+   - Upsell type, gender, date of birth, split field values (check `tests/funnels/` first)
+4. Create the new section: `add_section` (name = `{Funnel Name} (AI generated)`, parent_id: 8648).
+5. Create all 12 standard cases one by one with `add_case`, following `.claude/rules/testrail-funnels-suite.md`:
+   - Titles: see `.claude/rules/funnel-case-titles.md` — all end with "(AI generated)"
+   - Preconditions: structured HTML, `<strong>` values, clickable URL, zodiac inferred from date
+   - Steps: per-case structure from rules — no funnel-specific values in steps
+   - Estimate: "10min" for Cases 1–10, "20min" for Case 11, "30min" for Case 12
+   - Cases 11–12: always `custom_automation_status: 4` (Won't automate)
+   - Old counterpart existed: copy `refs` and `custom_automation_status` from old case
+   - No old counterpart (e.g. Cases 9, 10, 11, 12 if new): `custom_automation_status: 3`, `refs` empty
+   - Case 6: omit entirely if funnel has no scan
+6. Return a summary table: case ID | title | refs | automation status.
 
-2. Check if section already exists using `get_sections` (project_id: 6, suite_id: 486).
-   - If not → create it with `add_section` (parent_id: 8648).
+## Standard 12-Case Set
 
-3. Create all applicable cases one by one using `add_case`, following the format in `.claude/rules/testrail-funnels-suite.md`:
-   - Preconditions: structured HTML with `<strong>` values, clickable URL, zodiac inferred from date
-   - Steps: collapsed quiz with explicit split values, shared_step_id 17 then 74
-   - Last step: Automation Notes
-   - All titles end with "(AI generated)"
+See `.claude/rules/funnel-case-titles.md` for exact titles.
 
-4. After all cases are created, return a summary table with case IDs and titles.
+| # | Special handling |
+|---|-----------------|
+| 6 | Omit if funnel has no scan |
+| 11 | `custom_automation_status: 4` (Won't automate) |
+| 12 | `custom_automation_status: 4` (Won't automate) |
+
+## DO NOT
+- Do NOT ask all questions at once — one at a time
+- Do NOT ask for values already found in existing preconditions or code
+- Do NOT add Automation Notes step
+- Do NOT apply price corrections without verifying against the Standard Subscription Price Mapping in `.claude/rules/testrail-funnels-suite.md`

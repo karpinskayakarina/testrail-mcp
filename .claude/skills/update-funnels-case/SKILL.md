@@ -29,10 +29,9 @@ Update an existing funnel test case in TestRail to match the current standard fo
 
 4. Identify what is missing or outdated compared to `.claude/rules/testrail-funnels-suite.md`:
    - Preconditions use the structured HTML template with `<strong>` values
-   - Steps collapse random quiz screens into one step
-   - Split screens (gender, palmReadingGoal, etc.) have explicit `<strong>` values
-   - shared_step_id 17 and 74 are referenced (not written out manually)
-   - Automation Notes exist as the last step
+   - Steps follow the per-case structure from rules — no funnel-specific values inline
+   - Split screens (gender, palmReadingGoal, etc.) have explicit `<strong>` values in preconditions
+   - Subscription prices match the Standard Subscription Price Mapping (see rules) — confirm with user if deviation found
    - Title ends with "(AI generated)"
 5. Ask the required questions from the rules (ONE AT A TIME) only for values not found in the existing case or in code.
 6. Call `update_case` (or `add_case` if creating new) with the improved content.
