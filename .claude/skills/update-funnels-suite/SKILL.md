@@ -37,6 +37,19 @@ Update all test cases in an existing funnel section to the current standard form
    - Otherwise → append ` (AI generated)` to the section name
 9. Return a summary table: case ID | title | what changed.
 
+## When creating a NEW section instead of updating (old cases preserved)
+
+If the user asks to create new cases in a new section (leaving old section untouched):
+1. Create the new section with `add_section` (name = `{Funnel Name} (AI generated)`, parent_id: 8648)
+2. Fetch old section cases with `get_cases` to extract:
+   - All test data (prices, email subject/button, dates, split values) from existing `custom_preconds`
+   - **`refs` field** from each existing case — copy to the corresponding new case by case type match
+   - **`custom_automation_status`** from each existing case — copy to the corresponding new case by case type match
+3. Create all 12 standard cases in the new section
+4. For each new case where the old counterpart had a `refs` value → set the same `refs` on the new case
+5. For each new case — use `custom_automation_status` from the old counterpart (not the default 3)
+6. Cases with no old counterpart (e.g. Case 9, 10 if new) → use default `custom_automation_status: 3`, leave `refs` empty
+
 ## Standard 12-Case Set
 
 | # | Title | Notes |

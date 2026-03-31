@@ -376,6 +376,7 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Keep all funnel-specific values (prices, gender, dates, scan type, etc.) in Preconditions test data only
 - Keep steps universal — reusable across funnels without modification
 - For success flow cases: use empty steps `[]`
+- **When creating new cases for a funnel that already has an existing section: fetch the old section's cases and copy both `refs` and `custom_automation_status` to the matching new case by case type. If the old case had no refs — leave empty. Cases with no old counterpart → use default `custom_automation_status: 3`, empty refs.**
 
 ## DON'T
 - Don't omit "(AI generated)" from the title
