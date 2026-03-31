@@ -386,7 +386,6 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - Don't duplicate shared steps
 - Don't ask about subscription if it exists in subscription.ts
 - Don't ask all questions at once
-- Don't add Automation Notes step
 - Don't change template_id, type_id, priority_id
 - Don't use `custom_completion_status: 4` (Done) for new cases — use 2 (Ready for review)
 - Don't repeat in steps any value already present in preconditions

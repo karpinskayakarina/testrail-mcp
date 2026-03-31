@@ -46,5 +46,4 @@ See `.claude/rules/funnel-case-titles.md` for exact titles.
 ## DO NOT
 - Do NOT ask all questions at once — one at a time
 - Do NOT ask for values already found in existing preconditions or code
-- Do NOT add Automation Notes step
 - Do NOT apply price corrections without verifying against the Standard Subscription Price Mapping in `.claude/rules/testrail-funnels-suite.md`
