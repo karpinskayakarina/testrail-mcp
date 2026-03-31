@@ -200,6 +200,25 @@ Example: `"Check successful payments for user with EU locale and email check (AI
 
 ---
 
+## Standard Subscription Price Mapping
+
+Use this table when setting or verifying subscription prices (applies to all currencies — EUR, USD, etc.):
+
+| Trial price | Recurring price |
+|-------------|----------------|
+| 1           | 42.99          |
+| 5           | 42.99          |
+| 9           | 49.99          |
+| 13.67       | 49.99          |
+
+**Exceptions — do NOT apply this mapping to:**
+- LATAM prices — funnel-specific, keep existing or ask
+- Post-timer prices (e.g. `71.50`) — intentionally different, keep as-is
+
+> **IMPORTANT:** If a test case has a price combination that does NOT match this table, **do NOT change it blindly** — always confirm with the user first before applying any corrections.
+
+---
+
 ## Before Creating or Updating a Case
 
 Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT A TIME, never all at once.

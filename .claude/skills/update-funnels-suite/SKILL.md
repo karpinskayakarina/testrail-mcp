@@ -90,3 +90,4 @@ If the user asks to create new cases in a new section (leaving old section untou
 - Do NOT rename the section before all cases are updated
 - Do NOT ask all missing questions at once — one at a time
 - Do NOT update unrecognised cases without explicit user confirmation
+- Do NOT apply price corrections blindly — before changing any subscription price, verify it matches the Standard Subscription Price Mapping in `.claude/rules/testrail-funnels-suite.md`; if a case has a combination that does NOT match the table, **always confirm with the user first**
