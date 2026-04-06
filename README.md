@@ -3,6 +3,7 @@
 A Model Context Protocol (MCP) server for interacting with the TestRail API. Deployed on Railway and used by Claude agents to create, read, and update test cases across multiple suites in the Nebula project.
 
 **Currently active:** Funnels (AppNebula Funnels, Quiz funnels)
+**Status:** Active development
 
 **Planned:** AskNebula, API, Mobile: iOS, Mobile: Android
 
