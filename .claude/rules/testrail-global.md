@@ -18,6 +18,8 @@ When creating any Jira task — regardless of suite or project — always set:
 
 This applies to Funnels tasks, AskNebula tasks, Mobile tasks, API tasks, and any future suite.
 
+> **Summary sanitization:** Never include `(AI generated)` in any Jira task summary. Strip it from case titles before composing the summary.
+
 ---
 
 ## Jira Task Linking
@@ -38,6 +40,8 @@ For every other suite (Quiz funnels 8694, AskNebula 170, Mobile: iOS 136, Mobile
 #### Jira task naming convention (non-Funnels suites)
 
 Summary format: `Automation / {Suite Name} / C{case_id}: {case title}`
+
+- Strip `(AI generated)` from the case title — do NOT include it in the summary.
 
 Examples:
 - `Automation / AskNebula / C369456: Verify email channel is enabled in all categories when email consent is granted outside Notification Center`
