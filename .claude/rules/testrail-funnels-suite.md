@@ -219,6 +219,77 @@ Use this table when setting or verifying subscription prices (applies to all cur
 
 ---
 
+## Content Validation (MANDATORY before every update_case / add_case call)
+
+Before calling `update_case` or `add_case`, validate ALL content — preconditions, steps, and expected results:
+
+### HTML structure
+- **No double-wrapped `<p>` tags** — must NOT start with `<p><p>` or end with `</p></p>`
+- **No nested `<a>` inside `href`** — `href` must be a plain URL, not HTML
+- **No empty `<p>` tags** — `<p></p>` or `<p> </p>` must not appear anywhere
+- **No trailing empty paragraphs** — last element of `custom_preconds` or step `content`/`expected` must not be an empty `<p>`
+
+### Content quality
+- **No duplicate steps** — each step must describe a distinct action; remove exact or near-exact duplicates
+- **No placeholder text** — remove any `TBD`, `TODO`, `...`, or similar unfinished markers
+- **Sequential step numbering** — steps must be numbered 0, 1, 2, … with no gaps or repeats
+
+Fix all violations before calling the API.
+
+---
+
+## Jira Task Linking (new funnel sections only)
+
+When creating a brand-new section for a funnel that has **no existing cases anywhere in suite 486**, automatically create and link a Jira automation task.
+
+> **Skip this entire section** if an old section existed — refs are copied from old cases in that path.
+
+### Duplicate check (always first)
+
+Search Jira before creating anything:
+```
+project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issuetype = Task
+```
+- Sanitize funnel slug for display: replace `-` and `_` with spaces, Title Case each word
+  (e.g. `birth-chart-calculator` → `Birth Chart Calculator`)
+- If a task already exists → use its key and URL; skip creation
+- If not found → create a new task (see below)
+
+### Create Jira task
+
+| Field | Value |
+|-------|-------|
+| Parent epic | `AUTOMATION-2953` |
+| Issue type | Task |
+| Summary | `Automation / {Display_Name} funnel` |
+| Description | Link to the TestRail section (see below) |
+| Labels | `automation`, `funnels` |
+
+Description format:
+```
+TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}
+```
+
+### Linking after creation
+
+- **Every test case** in the new suite: set `refs = JIRA_KEY` (e.g. `AUTOMATION-1234`)
+- **Section level**: update section `description` via `update_section` to include the Jira task URL
+
+### Failure handling
+
+On Jira API failure → retry once. If retry also fails:
+- Continue creating cases (do NOT abort)
+- Cases get no `refs`
+- Report the failure in the final summary with a list of case IDs that need manual linking
+
+### Cases added after initial creation
+
+If cases are added to the suite later:
+- Look up the Jira key from `refs` of any existing case in the section, or search Jira for the summary
+- Set `refs = JIRA_KEY` on the new case before calling `add_case`
+
+---
+
 ## Before Creating or Updating a Case
 
 Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT A TIME, never all at once.
@@ -366,6 +437,8 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 ---
 
 ## DO
+- **Always validate content before `update_case` / `add_case`**: fix HTML issues, duplicate steps, TBD/TODO placeholders, and step numbering gaps (see Content Validation section above)
+- **For new funnel sections with no existing cases**: create a Jira automation task under `AUTOMATION-2953`, link it to every case via `refs`, and update section `description` with the Jira URL (see Jira Task Linking section above)
 - Always add "(AI generated)" to the title
 - Always use `<strong>` for explicit values in preconditions test data
 - Always include zodiac sign inferred from date of birth
@@ -381,6 +454,10 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 - **When creating new cases for a funnel that already has an existing section: fetch the old section's cases and copy both `refs` and `custom_automation_status` to the matching new case by case type. If the old case had no refs — leave empty. Cases with no old counterpart → use default `custom_automation_status: 3`, empty refs.**
 
 ## DON'T
+- Don't skip content validation before any `update_case` or `add_case` call
+- Don't create a Jira task if one already exists for this funnel (check first via JQL)
+- Don't abort case creation if Jira API fails — retry once, then continue and report
+- Don't set Jira `refs` when old section existed — refs come from old cases
 - Don't omit "(AI generated)" from the title
 - Don't write out shared step content manually — use shared_step_id
 - Don't duplicate shared steps
