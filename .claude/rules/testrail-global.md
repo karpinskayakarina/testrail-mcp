@@ -8,6 +8,18 @@ type: reference
 
 > **Scope:** All suites and sections — applies everywhere unless a suite-specific rule overrides it.
 
+## Jira Task Fields (all tasks, no exceptions)
+
+When creating any Jira task — regardless of suite or project — always set:
+
+| Field | Value |
+|-------|-------|
+| `components` | `Automation` |
+
+This applies to Funnels tasks, AskNebula tasks, Mobile tasks, API tasks, and any future suite.
+
+---
+
 ## Jira Task Linking
 
 ### AppNebula Funnels (suite 486, parent_id: 8648) — automatic
@@ -22,6 +34,16 @@ For every other suite (Quiz funnels 8694, AskNebula 170, Mobile: iOS 136, Mobile
 
 - If **yes** → use the mapping below to find the correct Jira story; if the section is not in the mapping — ask the user which story to use. Create a task under that story with a **simple description** (no prescribed template — do NOT use the "Automate all test cases" format; that format is only for Funnels/8648)
 - If **no** → skip Jira linking
+
+#### Jira task naming convention (non-Funnels suites)
+
+Summary format: `Automation / {Suite Name} / C{case_id}: {case title}`
+
+Examples:
+- `Automation / AskNebula / C369456: Verify email channel is enabled in all categories when email consent is granted outside Notification Center`
+- `Automation / Mobile: iOS / C123456: Verify user can log in with valid credentials`
+
+Suite name values: `AskNebula`, `Mobile: iOS`, `Mobile: Android`, `API`
 
 > **Important:** The structured Jira description format ("Automate all test cases in the TestRail section below that have the status 'To Be Automated'...") applies **only** to AppNebula Funnels (parent_id: 8648). For all other suites — use a plain, context-appropriate description or leave it to the user to fill in.
 

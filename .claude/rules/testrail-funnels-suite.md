@@ -275,6 +275,7 @@ Ask: "Should the Jira task be assigned to someone? (name or leave blank to skip)
 | Assignee | from previous step (optional) |
 | Description | see format below |
 | Labels | `automation`, `funnels` |
+| Components | `Automation` |
 
 Description format (in English):
 ```

@@ -94,6 +94,7 @@ Call `createJiraIssue` with:
   Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
   ```
 - Labels: `automation`, `funnels`
+- Components: `Automation`
 
 On failure → retry once (wait and call again). If the second attempt also fails:
 - Record the error.
