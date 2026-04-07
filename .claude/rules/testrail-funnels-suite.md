@@ -219,6 +219,19 @@ Use this table when setting or verifying subscription prices (applies to all cur
 
 ---
 
+## HTML Validation (MANDATORY before every update_case / add_case call)
+
+Before calling `update_case` or `add_case`, validate ALL HTML content (preconditions and steps):
+
+- **No double-wrapped `<p>` tags** — content must NOT start with `<p><p>` or end with `</p></p>`
+- **No nested `<a>` tags inside `href`** — `href` value must be a plain URL, not HTML
+- **No empty `<p>` tags** — `<p></p>` or `<p> </p>` must not appear anywhere
+- **No trailing empty paragraphs** — last element of `custom_preconds` or step `content`/`expected` must not be an empty `<p>`
+
+If any violation is found — fix the HTML before calling the API.
+
+---
+
 ## Before Creating or Updating a Case
 
 Look up the following in code FIRST. Ask only if not found. Ask questions ONE AT A TIME, never all at once.
@@ -366,6 +379,7 @@ Values: 2 = Ready for review, 4 = Done. Always use 2 for new AI-generated cases.
 ---
 
 ## DO
+- **Always validate HTML before `update_case` / `add_case`**: no double `<p>`, no nested `<a>`, no empty `<p>`, no trailing empty paragraphs (see HTML Validation section above)
 - Always add "(AI generated)" to the title
 - Always use `<strong>` for explicit values in preconditions test data
 - Always include zodiac sign inferred from date of birth
