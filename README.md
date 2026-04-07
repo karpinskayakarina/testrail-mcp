@@ -1,32 +1,26 @@
 # TestRail MCP Server
 
-A Model Context Protocol (MCP) server for interacting with the TestRail API. Deployed on Railway and used by Claude agents to create, read, and update test cases across multiple suites in the Nebula project.
+A Model Context Protocol (MCP) server for interacting with the TestRail API. Used by Claude agents to create, read, and update test cases across multiple suites in the Nebula project.
 
 **Currently active:** Funnels (AppNebula Funnels, Quiz funnels)
 
 **Planned:** AskNebula, API, Mobile: iOS, Mobile: Android
 
-## Deployment
-
-**Production URL:** `https://testrail-mcp-production.up.railway.app/mcp`
-
-Railway auto-deploys on every push to `main`.
-
 ## Connecting to Claude
 
 **Claude Code (project-level):**
 ```bash
-claude mcp add --transport http testrail https://testrail-mcp-production.up.railway.app/mcp
+claude mcp add --transport http testrail http://localhost:8080/mcp
 ```
 
 **Claude Code (global):**
 ```bash
-claude mcp add --transport http testrail https://testrail-mcp-production.up.railway.app/mcp --scope user
+claude mcp add --transport http testrail http://localhost:8080/mcp --scope user
 ```
 
 ## Environment Variables
 
-Set these in the Railway dashboard:
+Set these in your `.env` file:
 
 | Variable | Description |
 |----------|-------------|
