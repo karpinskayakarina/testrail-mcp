@@ -34,5 +34,12 @@ Update an existing funnel test case in TestRail to match the current standard fo
    - Subscription prices match the Standard Subscription Price Mapping (see rules) — confirm with user if deviation found
    - Title ends with "(AI generated)"
 5. Ask the required questions from the rules (ONE AT A TIME) only for values not found in the existing case or in code.
-6. Call `update_case` (or `add_case` if creating new) with the improved content.
-7. Confirm which fields were updated.
+6. **Before calling `update_case` or `add_case` — HTML validation (MANDATORY):**
+   - No double-wrapped `<p>` tags (content must not start with `<p><p>` or end with `</p></p>`)
+   - No nested `<a>` tags inside `href` attributes (href must be a plain URL)
+   - No empty `<p>` tags (`<p></p>` or `<p> </p>`)
+   - No trailing empty paragraphs at the end of `custom_preconds` or step `content`/`expected`
+   - If any violation found — fix the HTML before calling the API.
+
+7. Call `update_case` (or `add_case` if creating new) with the improved content.
+8. Confirm which fields were updated.

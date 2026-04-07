@@ -26,16 +26,23 @@ Update all test cases in an existing funnel section to the current standard form
    - Split field values (gender, date of birth, funnel-specific split e.g. `palmReadingGoal`)
    - Discount subscription price (Case 4)
 6. Ask (ONE AT A TIME) only for values NOT found in any existing case.
-7. Update each case with `update_case`, using the corresponding Palmistry (AI generated) case as the format reference:
+7. **Before calling `update_case` — HTML validation (MANDATORY):**
+   - No double-wrapped `<p>` tags (content must not start with `<p><p>` or end with `</p></p>`)
+   - No nested `<a>` tags inside `href` attributes (href must be a plain URL)
+   - No empty `<p>` tags (`<p></p>` or `<p> </p>`)
+   - No trailing empty paragraphs at the end of `custom_preconds` or step `content`/`expected`
+   - If any violation found — fix the HTML before calling the API.
+
+8. Update each case with `update_case`, using the corresponding Palmistry (AI generated) case as the format reference:
    - **Title**: add `(AI generated)` at the end if not already present
    - **Preconditions**: rewrite in standard HTML format per `.claude/rules/testrail-funnels-suite.md`
    - **Steps**: rewrite per case type rules in `.claude/rules/testrail-funnels-suite.md`
    - **Writing status**: always set `custom_completion_status: 2` (Ready for review)
    - **Metadata**: copy from existing case as-is — do NOT change `priority_id`, `template_id`, `type_id`, `custom_automation_status`, `custom_smoke`, `custom_regression`, `custom_isabtest`, `custom_case_platform_dropdown`, `estimate`
-8. After all cases are updated, rename the section with `update_section`:
+9. After all cases are updated, rename the section with `update_section`:
    - If name already ends with `(AI generated)` → skip rename
    - Otherwise → append ` (AI generated)` to the section name
-9. Return a summary table: case ID | title | what changed.
+10. Return a summary table: case ID | title | what changed.
 
 ## When creating a NEW section instead of updating (old cases preserved)
 

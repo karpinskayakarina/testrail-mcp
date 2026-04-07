@@ -23,5 +23,12 @@ Create a single new funnel test case in TestRail following the current standard 
    - Preconditions: structured HTML with `<strong>` values, clickable URL, zodiac inferred from date
    - Steps: per-case structure from rules — no funnel-specific values in steps
    - Title ends with "(AI generated)"
-5. Call `add_case` with all required fields.
-6. Return the new case ID.
+5. **Before calling `add_case` — HTML validation (MANDATORY):**
+   - No double-wrapped `<p>` tags (content must not start with `<p><p>` or end with `</p></p>`)
+   - No nested `<a>` tags inside `href` attributes (href must be a plain URL)
+   - No empty `<p>` tags (`<p></p>` or `<p> </p>`)
+   - No trailing empty paragraphs at the end of `custom_preconds` or step `content`/`expected`
+   - If any violation found — fix the HTML before calling the API.
+
+6. Call `add_case` with all required fields.
+7. Return the new case ID.
