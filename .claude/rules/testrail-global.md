@@ -20,8 +20,10 @@ For every other suite (Quiz funnels 8694, AskNebula 170, Mobile: iOS 136, Mobile
 
 > "Should a Jira task be created and linked to these cases?"
 
-- If **yes** → use the mapping below to find the correct Jira story; if the section is not in the mapping — ask the user which story to use
+- If **yes** → use the mapping below to find the correct Jira story; if the section is not in the mapping — ask the user which story to use. Create a task under that story with a **simple description** (no prescribed template — do NOT use the "Automate all test cases" format; that format is only for Funnels/8648)
 - If **no** → skip Jira linking
+
+> **Important:** The structured Jira description format ("Automate all test cases in the TestRail section below that have the status 'To Be Automated'...") applies **only** to AppNebula Funnels (parent_id: 8648). For all other suites — use a plain, context-appropriate description or leave it to the user to fill in.
 
 ### TestRail section → Jira story mapping
 
