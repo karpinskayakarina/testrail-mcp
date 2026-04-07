@@ -70,12 +70,21 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 - If a task is found → use its key and URL; skip creation. Log: "Reusing existing Jira task `{KEY}`."
 - If not found → proceed to Step C.
 
-**Step C — Create Jira task**
+**Step C — Ask about assignee**
+
+Before creating the task, ask the user:
+> "Should the Jira task be assigned to someone? (name or leave blank to skip)"
+
+- If the user provides a name → use `lookupJiraAccountId` to resolve the account ID, then pass `assignee_account_id` to `createJiraIssue`.
+- If the user skips → create without assignee.
+
+**Step D — Create Jira task**
 
 Call `createJiraIssue` with:
 - Parent: `AUTOMATION-2953` (epic)
 - Issue type: Task
 - Summary: `Automation / {Display_Name} funnel`
+- Assignee: account ID from Step C (if provided)
 - Description (in English):
   ```
   Automate all test cases in the TestRail section below that have the status "To Be Automated".
@@ -91,7 +100,7 @@ On failure → retry once (wait and call again). If the second attempt also fail
 - After Phase 6, report: "Jira task creation failed — cases created without refs. Manual linking required."
 - Do NOT abort the whole flow.
 
-**Step D — Update Jira description** (after section_id is confirmed)
+**Step E — Update Jira description** (after section_id is confirmed)
 
 If the section was created before the Jira task was created (which is always the case here), update the Jira task description via `editJiraIssue` to ensure the section link is accurate:
 - Description (in English):

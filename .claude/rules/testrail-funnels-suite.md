@@ -255,6 +255,12 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 - If a task already exists → use its key and URL; skip creation
 - If not found → create a new task (see below)
 
+### Ask about assignee (before creating)
+
+Ask: "Should the Jira task be assigned to someone? (name or leave blank to skip)"
+- If name provided → resolve account ID via `lookupJiraAccountId`, pass as `assignee_account_id`
+- If skipped → create without assignee
+
 ### Create Jira task
 
 | Field | Value |
@@ -262,7 +268,8 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 | Parent epic | `AUTOMATION-2953` |
 | Issue type | Task |
 | Summary | `Automation / {Display_Name} funnel` |
-| Description | Link to the TestRail section (see below) |
+| Assignee | from previous step (optional) |
+| Description | see format below |
 | Labels | `automation`, `funnels` |
 
 Description format (in English):
