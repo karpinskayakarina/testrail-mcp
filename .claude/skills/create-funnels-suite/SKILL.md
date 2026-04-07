@@ -76,7 +76,13 @@ Call `createJiraIssue` with:
 - Parent: `AUTOMATION-2953` (epic)
 - Issue type: Task
 - Summary: `Automation / {Display_Name} funnel`
-- Description: `TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}`
+- Description (in English):
+  ```
+  Automate all test cases in the TestRail section below that have the status "To Be Automated".
+
+  Section ID: {section_id}
+  Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
+  ```
 - Labels: `automation`, `funnels`
 
 On failure → retry once (wait and call again). If the second attempt also fails:
@@ -88,7 +94,13 @@ On failure → retry once (wait and call again). If the second attempt also fail
 **Step D — Update Jira description** (after section_id is confirmed)
 
 If the section was created before the Jira task was created (which is always the case here), update the Jira task description via `editJiraIssue` to ensure the section link is accurate:
-- Description: `TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}`
+- Description (in English):
+  ```
+  Automate all test cases in the TestRail section below that have the status "To Be Automated".
+
+  Section ID: {section_id}
+  Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
+  ```
 
 Save:
 - `JIRA_KEY` (e.g. `AUTOMATION-1234`)

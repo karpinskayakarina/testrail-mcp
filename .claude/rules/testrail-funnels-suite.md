@@ -265,9 +265,12 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 | Description | Link to the TestRail section (see below) |
 | Labels | `automation`, `funnels` |
 
-Description format:
+Description format (in English):
 ```
-TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}
+Automate all test cases in the TestRail section below that have the status "To Be Automated".
+
+Section ID: {section_id}
+Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
 ```
 
 ### Linking after creation
