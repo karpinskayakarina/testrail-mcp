@@ -34,8 +34,16 @@ For every other suite (Quiz funnels 8694, AskNebula 170, Mobile: iOS 136, Mobile
 
 > "Should a Jira task be created and linked to these cases?"
 
-- If **yes** → use the mapping below to find the correct Jira story; if the section is not in the mapping — ask the user which story to use. Create a task under that story with a **simple description** (no prescribed template — do NOT use the "Automate all test cases" format; that format is only for Funnels/8648)
+- If **yes** → use the mapping below to find the correct Jira story; if the section is not in the mapping — ask the user which story to use. Create a task with the description format below
 - If **no** → skip Jira linking
+
+#### Jira task description format (non-Funnels suites)
+
+```
+C{case_id}: [TestRail](https://obrio.testrail.io/index.php?/cases/view/{case_id})
+```
+
+Do NOT use the "Automate all test cases / To Be Automated" template — that format is only for Funnels (parent_id: 8648).
 
 #### Jira task naming convention (non-Funnels suites)
 
