@@ -6,7 +6,8 @@
 > **Reference section:** Palmistry (AI generated), section_id: 62173 — use as the format reference for all cases.
 
 Create a complete set of 12 standard test cases for a new funnel in TestRail.
-When the funnel has **no existing section**, automatically create a linked Jira automation task and attach it to the section and every test case.
+When the funnel has **no existing section** and is under **AppNebula Funnels (parent_id: 8648)**, automatically create a linked Jira automation task and attach it to the section and every test case.
+Jira auto-creation does **not** apply to Quiz funnels (parent_id: 8694).
 
 ---
 

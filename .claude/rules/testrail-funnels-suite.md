@@ -240,7 +240,11 @@ Fix all violations before calling the API.
 
 ## Jira Task Linking (new funnel sections only)
 
-When creating a brand-new section for a funnel that has **no existing cases anywhere in suite 486**, automatically create and link a Jira automation task.
+> **Scope:** AppNebula Funnels only — sections whose `parent_id` is **8648**.
+> Does NOT apply to Quiz funnels (parent_id: 8694) or any other suite.
+> For other suites — see global rule in `testrail-global.md`.
+
+When creating a brand-new section under parent_id 8648 for a funnel that has **no existing cases**, automatically create and link a Jira automation task.
 
 > **Skip this entire section** if an old section existed — refs are copied from old cases in that path.
 
