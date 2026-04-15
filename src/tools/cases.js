@@ -27,15 +27,15 @@ const stepsSchema = z.string().optional().describe(
   'Steps with expected results (template_id:2). JSON array: [{"content":"<p>step</p>","expected":"<p>result</p>","additional_info":"","refs":""}]'
 );
 
-// Multi-select fields: accept comma-separated string "1,2" or single number,
-// and convert to array for TestRail API.
-const coerceIntArray = z.preprocess((v) => {
-  if (v == null) return undefined;
-  if (typeof v === 'string') return v.split(',').map(Number);
-  if (typeof v === 'number') return [v];
-  if (Array.isArray(v)) return v.map(Number);
-  return v;
-}, z.array(z.number().int()).optional());
+// Multi-select fields: accept comma-separated string "1,2" or single number.
+// Uses z.string() for clean JSON Schema export; converted to array before API call.
+function parseIntArray(value) {
+  if (value == null) return undefined;
+  if (typeof value === 'string') return value.split(',').map(Number);
+  if (typeof value === 'number') return [value];
+  if (Array.isArray(value)) return value.map(Number);
+  return value;
+}
 
 const customFields = {
   custom_steps_separated: stepsSchema,
@@ -46,8 +46,8 @@ const customFields = {
   custom_smoke: coerceBool.optional().describe('Is smoke test'),
   custom_isabtest: coerceBool.optional().describe('Is A/B test'),
   custom_case_platform_dropdown: coerceInt.optional().describe('Platform (1=Web, 4=AppNebula)'),
-  custom_case_role: coerceIntArray.describe('User role (NebulaX, required). Multi-select array. 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=ASM, 6=QC. Pass comma-separated string "1,2" or single number.'),
-  custom_case_automated_for_role: coerceIntArray.describe('Automated for role (NebulaX). Multi-select array. 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=Undefined, 6=ASM, 7=QC. Pass comma-separated string or single number.'),
+  custom_case_role: z.string().optional().describe('User role (NebulaX, required). Comma-separated IDs: 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=ASM, 6=QC. E.g. "3" or "1,2".'),
+  custom_case_automated_for_role: z.string().optional().describe('Automated for role (NebulaX). Comma-separated IDs: 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=Undefined, 6=ASM, 7=QC. E.g. "3" or "1,2".'),
 };
 
 module.exports = function registerCases(server, client) {
@@ -90,6 +90,8 @@ module.exports = function registerCases(server, client) {
     try {
       const parsed = parseStepsSeparated(custom_steps_separated);
       if (parsed) data.custom_steps_separated = parsed;
+      data.custom_case_role = parseIntArray(data.custom_case_role);
+      data.custom_case_automated_for_role = parseIntArray(data.custom_case_automated_for_role);
       return ok(await client.addCase(section_id, data));
     } catch (e) { return err(e); }
   });
@@ -111,6 +113,8 @@ module.exports = function registerCases(server, client) {
     try {
       const parsed = parseStepsSeparated(custom_steps_separated);
       if (parsed) data.custom_steps_separated = parsed;
+      data.custom_case_role = parseIntArray(data.custom_case_role);
+      data.custom_case_automated_for_role = parseIntArray(data.custom_case_automated_for_role);
       return ok(await client.updateCase(case_id, data));
     } catch (e) { return err(e); }
   });
