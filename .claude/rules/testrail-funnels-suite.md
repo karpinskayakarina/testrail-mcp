@@ -240,7 +240,11 @@ Fix all violations before calling the API.
 
 ## Jira Task Linking (new funnel sections only)
 
-When creating a brand-new section for a funnel that has **no existing cases anywhere in suite 486**, automatically create and link a Jira automation task.
+> **Scope:** AppNebula Funnels only — sections whose `parent_id` is **8648**.
+> Does NOT apply to Quiz funnels (parent_id: 8694) or any other suite.
+> For other suites — see global rule in `testrail-global.md`.
+
+When creating a brand-new section under parent_id 8648 for a funnel that has **no existing cases**, automatically create and link a Jira automation task.
 
 > **Skip this entire section** if an old section existed — refs are copied from old cases in that path.
 
@@ -255,6 +259,12 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 - If a task already exists → use its key and URL; skip creation
 - If not found → create a new task (see below)
 
+### Ask about assignee (before creating)
+
+Ask: "Should the Jira task be assigned to someone? (name or leave blank to skip)"
+- If name provided → resolve account ID via `lookupJiraAccountId`, pass as `assignee_account_id`
+- If skipped → create without assignee
+
 ### Create Jira task
 
 | Field | Value |
@@ -262,12 +272,17 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 | Parent epic | `AUTOMATION-2953` |
 | Issue type | Task |
 | Summary | `Automation / {Display_Name} funnel` |
-| Description | Link to the TestRail section (see below) |
+| Assignee | from previous step (optional) |
+| Description | see format below |
 | Labels | `automation`, `funnels` |
+| Components | `Automation` |
 
-Description format:
+Description format (in English):
 ```
-TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}
+Automate all test cases in the TestRail section below that have the status "To Be Automated".
+
+Section ID: {section_id}
+Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
 ```
 
 ### Linking after creation

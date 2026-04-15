@@ -6,7 +6,8 @@
 > **Reference section:** Palmistry (AI generated), section_id: 62173 — use as the format reference for all cases.
 
 Create a complete set of 12 standard test cases for a new funnel in TestRail.
-When the funnel has **no existing section**, automatically create a linked Jira automation task and attach it to the section and every test case.
+When the funnel has **no existing section** and is under **AppNebula Funnels (parent_id: 8648)**, automatically create a linked Jira automation task and attach it to the section and every test case.
+Jira auto-creation does **not** apply to Quiz funnels (parent_id: 8694).
 
 ---
 
@@ -70,14 +71,30 @@ project = AUTOMATION AND summary ~ "Automation / {Display_Name} funnel" AND issu
 - If a task is found → use its key and URL; skip creation. Log: "Reusing existing Jira task `{KEY}`."
 - If not found → proceed to Step C.
 
-**Step C — Create Jira task**
+**Step C — Ask about assignee**
+
+Before creating the task, ask the user:
+> "Should the Jira task be assigned to someone? (name or leave blank to skip)"
+
+- If the user provides a name → use `lookupJiraAccountId` to resolve the account ID, then pass `assignee_account_id` to `createJiraIssue`.
+- If the user skips → create without assignee.
+
+**Step D — Create Jira task**
 
 Call `createJiraIssue` with:
 - Parent: `AUTOMATION-2953` (epic)
 - Issue type: Task
 - Summary: `Automation / {Display_Name} funnel`
-- Description: `TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}`
+- Assignee: account ID from Step C (if provided)
+- Description (in English):
+  ```
+  Automate all test cases in the TestRail section below that have the status "To Be Automated".
+
+  Section ID: {section_id}
+  Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
+  ```
 - Labels: `automation`, `funnels`
+- Components: `Automation`
 
 On failure → retry once (wait and call again). If the second attempt also fails:
 - Record the error.
@@ -85,10 +102,16 @@ On failure → retry once (wait and call again). If the second attempt also fail
 - After Phase 6, report: "Jira task creation failed — cases created without refs. Manual linking required."
 - Do NOT abort the whole flow.
 
-**Step D — Update Jira description** (after section_id is confirmed)
+**Step E — Update Jira description** (after section_id is confirmed)
 
 If the section was created before the Jira task was created (which is always the case here), update the Jira task description via `editJiraIssue` to ensure the section link is accurate:
-- Description: `TestRail section: https://nebula.testrail.io/index.php?/cases/index/6&suite_id=486&section_id={section_id}`
+- Description (in English):
+  ```
+  Automate all test cases in the TestRail section below that have the status "To Be Automated".
+
+  Section ID: {section_id}
+  Section link: https://obrio.testrail.io/index.php?/suites/view/486&group_id={section_id}
+  ```
 
 Save:
 - `JIRA_KEY` (e.g. `AUTOMATION-1234`)
