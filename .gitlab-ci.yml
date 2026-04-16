@@ -3,7 +3,7 @@ stages:
 
 deploy-production:
   stage: deploy
-  image: node:20-alpine
+  image: node:20
   tags:
     - docker
   only:
@@ -11,8 +11,7 @@ deploy-production:
   script:
     - npm install -g @railway/cli
     - railway version
-    - railway status || true
-    - railway up --detach --service testrail-mcp 2>&1 || echo "EXIT CODE $?"
+    - railway up --detach --service testrail-mcp
   variables:
     RAILWAY_TOKEN: $RAILWAY_TOKEN
     RAILWAY_PROJECT_ID: 37a084fe-71f1-4e5f-906b-973d4f4bf022
