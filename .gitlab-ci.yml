@@ -10,6 +10,7 @@ deploy-production:
     - main
   script:
     - npm install -g @railway/cli@latest
+    - echo "Token length is ${#RAILWAY_TOKEN}"
     - railway --version
     - railway up --detach --service testrail-mcp
   variables:
