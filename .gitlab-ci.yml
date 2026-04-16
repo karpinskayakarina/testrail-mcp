@@ -4,6 +4,8 @@ stages:
 deploy-production:
   stage: deploy
   image: node:20-alpine
+  tags:
+    - docker
   only:
     - main
   script:
