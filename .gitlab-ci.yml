@@ -9,10 +9,9 @@ deploy-production:
   only:
     - main
   script:
-    - npm install -g @railway/cli@latest
     - echo "Token length is ${#RAILWAY_TOKEN}"
+    - echo "First 4 chars ${RAILWAY_TOKEN:0:4}"
+    - echo "Project ID length ${#RAILWAY_PROJECT_ID}"
+    - npm install -g @railway/cli@latest
     - railway --version
     - railway up --detach --service testrail-mcp
-  variables:
-    RAILWAY_TOKEN: $RAILWAY_TOKEN
-    RAILWAY_PROJECT_ID: 37a084fe-71f1-4e5f-906b-973d4f4bf022
