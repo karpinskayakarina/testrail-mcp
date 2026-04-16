@@ -1,17 +1,15 @@
-stages:
-  - deploy
+include:
+  - project: 'qa/scripts/aqa-ci-scripts'
+    file: '/ci_aqa/pipelines/main.yml'
 
-deploy-production:
-  stage: deploy
-  image: node:20
-  tags:
-    - docker
-  only:
-    - main
-  script:
-    - echo "Token length is ${#RAILWAY_TOKEN}"
-    - echo "First 4 chars ${RAILWAY_TOKEN:0:4}"
-    - echo "Project ID length ${#RAILWAY_PROJECT_ID}"
-    - npm install -g @railway/cli@latest
-    - railway --version
-    - railway up --detach --service testrail-mcp
+stages:
+  - tag
+  - build
+  - deploy
+  - sync
+
+variables:
+  PROJECT: "nebula"
+  SERVICE_NAME: "testrail-mcp"
+  ARGO_DEPLOY: "true"
+  PROD_NAMESPACE: "obrio"
