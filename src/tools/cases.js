@@ -40,14 +40,14 @@ function parseIntArray(value) {
 const customFields = {
   custom_steps_separated: stepsSchema,
   custom_preconds: z.string().optional().describe('Preconditions text'),
+  custom_case_role: z.string().optional().describe('User role (NebulaX, required). Comma-separated IDs: 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=ASM, 6=QC. E.g. "3" or "1,2".'),
+  custom_case_automated_for_role: z.string().optional().describe('Automated for role (NebulaX). Comma-separated IDs: 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=Undefined, 6=ASM, 7=QC. E.g. "3" or "1,2".'),
   custom_automation_status: coerceInt.optional().describe('Automation status (1=Automation candidate, 2=Automated, 3=Not automated)'),
   custom_completion_status: coerceInt.optional().describe('Writing status in TestRail UI (2=Ready for review, 4=Done). Use 2 for new AI-generated cases.'),
   custom_regression: coerceBool.optional().describe('Is regression test'),
+  custom_case_platform_dropdown: coerceInt.optional().describe('Platform (1=Web, 4=AppNebula)'),
   custom_smoke: coerceBool.optional().describe('Is smoke test'),
   custom_isabtest: coerceBool.optional().describe('Is A/B test'),
-  custom_case_platform_dropdown: coerceInt.optional().describe('Platform (1=Web, 4=AppNebula)'),
-  custom_case_role: z.string().optional().describe('User role (NebulaX, required). Comma-separated IDs: 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=ASM, 6=QC. E.g. "3" or "1,2".'),
-  custom_case_automated_for_role: z.string().optional().describe('Automated for role (NebulaX). Comma-separated IDs: 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=Undefined, 6=ASM, 7=QC. E.g. "3" or "1,2".'),
 };
 
 module.exports = function registerCases(server, client) {
