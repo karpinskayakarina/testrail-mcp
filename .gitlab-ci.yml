@@ -10,7 +10,9 @@ deploy-production:
     - main
   script:
     - npm install -g @railway/cli
-    - railway up --detach --service testrail-mcp
+    - railway version
+    - railway status || true
+    - railway up --detach --service testrail-mcp 2>&1 || echo "EXIT CODE $?"
   variables:
     RAILWAY_TOKEN: $RAILWAY_TOKEN
     RAILWAY_PROJECT_ID: 37a084fe-71f1-4e5f-906b-973d4f4bf022
