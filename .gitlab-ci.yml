@@ -8,4 +8,7 @@ deploy-production:
     - main
   script:
     - npm install -g @railway/cli
-    - RAILWAY_TOKEN=$RAILWAY_TOKEN railway up --detach
+    - railway link --project 37a084fe-71f1-4e5f-906b-973d4f4bf022 --environment production
+    - railway up --detach
+  variables:
+    RAILWAY_TOKEN: $RAILWAY_TOKEN
