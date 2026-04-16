@@ -80,10 +80,8 @@ module.exports = function registerCases(server, client) {
     'Always add "(AI generated)" to the title.', {
     section_id: coerceInt.positive().describe('Section ID where the case will be created'),
     title: z.string().describe('Test case title. Must end with "(AI generated)"'),
-    type_id: coerceInt.positive().optional().describe('Case type ID (default = 6)'),
     priority_id: coerceInt.positive().optional().describe('Priority ID (default = 4)'),
     estimate: z.string().optional().describe('Estimated duration, e.g. "10min"'),
-    milestone_id: coerceInt.positive().optional().describe('Milestone ID'),
     refs: z.string().optional().describe('Comma-separated reference IDs (e.g. Jira ticket keys)'),
     ...customFields,
   }, async ({ section_id, custom_steps_separated, ...data }) => {
@@ -103,10 +101,8 @@ module.exports = function registerCases(server, client) {
     'Add "(AI generated)" to title if not already present.', {
     case_id: coerceInt.positive().describe('Test case ID'),
     title: z.string().optional().describe('Title. Must end with "(AI generated)"'),
-    type_id: coerceInt.positive().optional().describe('Case type ID — do not change for funnel cases (default: 6)'),
     priority_id: coerceInt.positive().optional().describe('Priority ID — do not change for funnel cases (default: 4)'),
     estimate: z.string().optional().describe('New estimate'),
-    milestone_id: coerceInt.positive().optional().describe('New milestone ID'),
     refs: z.string().optional().describe('New reference IDs'),
     ...customFields,
   }, async ({ case_id, custom_steps_separated, ...data }) => {
