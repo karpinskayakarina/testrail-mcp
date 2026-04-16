@@ -9,8 +9,8 @@ deploy-production:
   only:
     - main
   script:
-    - npm install -g @railway/cli
-    - railway version
+    - npm install -g @railway/cli@latest
+    - railway --version
     - railway up --detach --service testrail-mcp
   variables:
     RAILWAY_TOKEN: $RAILWAY_TOKEN
