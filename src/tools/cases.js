@@ -74,6 +74,32 @@ module.exports = function registerCases(server, client) {
     try { return ok(await client.getCases(project_id, params)); } catch (e) { return err(e); }
   });
 
+  server.tool('get_cases_lite',
+    'Get test cases with only id/title/custom_preconds fields. ' +
+    'Use this instead of get_cases when you only need case metadata and preconds ' +
+    '(avoids payload bloat from full step lists).', {
+    project_id: coerceInt.positive().describe('Project ID (e.g. Nebula = 6, NebulaX = 176)'),
+    suite_id: coerceInt.positive().optional().describe('Suite ID. Funnels suite = 486'),
+    section_id: coerceInt.positive().optional().describe('Section ID'),
+    type_id: coerceInt.positive().optional().describe('Case type ID'),
+    priority_id: coerceInt.positive().optional().describe('Priority ID'),
+    milestone_id: coerceInt.positive().optional().describe('Milestone ID'),
+    limit: coerceInt.positive().optional().describe('Max number of cases to return'),
+    offset: coerceInt.min(0).optional().describe('Pagination offset'),
+  }, async ({ project_id, ...params }) => {
+    try {
+      const result = await client.getCases(project_id, params);
+      const cases = Array.isArray(result?.cases)
+        ? result.cases.map((c) => ({
+            id: c.id,
+            title: c.title,
+            custom_preconds: c.custom_preconds,
+          }))
+        : result?.cases;
+      return ok({ ...result, cases });
+    } catch (e) { return err(e); }
+  });
+
   server.tool('add_case',
     'Create a new test case in any section. ' +
     'Use custom_steps_separated (not custom_steps) for cases with template_id=2. ' +
