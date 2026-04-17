@@ -1,6 +1,6 @@
 include:
   - project: 'qa/scripts/aqa-ci-scripts'
-    file: '/ci_aqa/pipelines/main.yml'
+    file: '/ci_aqa/pipelines/deploy.yml'
 
 stages:
   - tag
