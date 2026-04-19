@@ -174,13 +174,39 @@ If new cases are added to this suite later (e.g. via `/create-funnels-case`):
 
 ## Standard 12-Case Set
 
-See `.claude/rules/funnel-case-titles.md` for exact titles.
+| # | Title | Notes |
+|---|-------|-------|
+| 1 | Check successful payments for user with EU locale and email check | Ref: C418133 |
+| 2 | Check successful subscription payment for user with USA locale | Ref: C420186 |
+| 3 | Check flow for user with EU localization with subscription payment error | Ref: C418136 |
+| 4 | Check flow for user with EU localization with additional discount payment | Ref: C420182 |
+| 5 | Check flow for user with USA locale with error on upsell payments | Ref: C420187 |
+| 6 | Verify funnel flow with failed {scan type} scan for EU users | Ref: C418137 — omit if no scan |
+| 7 | Check flow for user with re-entering card after incorrect upsells payment | Ref: C420183 |
+| 8 | Check successful subscription flows on LATAM localizations | Ref: C420189 |
+| 9 | Check email marketing landing flow for EU user with email check | Ref: C420184 |
+| 10 | Check email marketing paywall flow for EU user with email check | Ref: C420185 |
+| 11 | Check flow with successful payments for user with USA locale when timer has expired and email check | Ref: C425054 — `custom_automation_status: 4` (Won't automate) |
+| 12 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Ref: C425055 — `custom_automation_status: 4` (Won't automate) |
 
-| # | Special handling |
-|---|-----------------|
-| 6 | Omit if funnel has no scan |
-| 11 | `custom_automation_status: 4` (Won't automate) |
-| 12 | `custom_automation_status: 4` (Won't automate) |
+See `.claude/rules/funnel-case-titles.md` for title rules and Case 6 scan-type substitution.
+
+## Per-Case Format Reference
+
+| Case | Locale | Steps pattern |
+|------|--------|---------------|
+| 1 | EU, Accept cookies, CAMERA | Step 0 full flow + post-payment (with email button check) |
+| 2 | USA, no cookies, CAMERA | Step 0 full flow + post-payment (with email button check) |
+| 3 | EU, Accept cookies, CAMERA | Step 0 to paywall + declined card |
+| 4 | EU, Accept cookies, CAMERA | Step 0 to paywall + declined → discount paywall + post-payment |
+| 5 | USA, no cookies, CAMERA | Step 0 to paywall + upsell fail × 2 + post-payment (no email button check) |
+| 6 | EU, Accept cookies, FILE+CAMERA note | Step 0 to scan + fail/retry + payment + post-payment (no email button check) |
+| 7 | USA, no cookies, CAMERA | Step 0 to paywall + upsell fail + re-enter card + post-payment (no email button check) |
+| 8 | LATAM, no cookies, CAMERA | Step 0 full flow + post-payment (no email button check) |
+| 9 | EU, Accept cookies, CAMERA | Step 1 to email screen + Step 2 landing payment + post-payment |
+| 10 | EU, Accept cookies, CAMERA | Step 1 full flow + email consent + Step 2 email link + post-payment |
+| 11 | USA, no cookies, CAMERA | Step 0 to paywall → timer expires → post-timer payment + post-payment |
+| 12 | EU, prerequisite: Case 1 completed | Step: verify email sequence delivered with correct content |
 
 ---
 
