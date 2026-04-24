@@ -62,7 +62,7 @@ Display the defaults from `references/testrail-config.md` as options:
 1. NebulaX Project:
     - Project: NebulaX (ID: 176), Folder: AI Generated Tests (ID: 73027)
 2. Nebula Project
-    - Project: NebulaX (ID: 6), Folder: AI Generated Tests (ID: 69886)
+    - Project: Nebula (ID: 6), Folder: AI Generated Tests (ID: 69886)
 2. Other — enter Project ID and Folder ID manually
 ```
 
