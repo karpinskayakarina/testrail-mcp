@@ -111,7 +111,8 @@ Format rules:
 
 ## Custom Fields — auto-fill defaults (non-Funnels suites)
 
-> **Exception:** Funnels suite 486 — fields are fixed by `streams/funnels-appnebula.md` and `streams/funnels-quiz.md`. These defaults do NOT apply to Funnels cases.
+> **Exception:** AppNebula Funnels (parent_id 8648) — fields are fixed by `streams/funnels-appnebula.md`. These defaults do NOT apply to AppNebula funnel cases.
+> **Quiz Funnels (parent_id 8694):** follow these global defaults (the only Funnels-style override is the `(AI generated)` title suffix — see `streams/funnels-quiz.md`).
 > **Product override:** Nebula X — see `products/nebulax.md` for CETS-specific overrides if they apply.
 
 Do **NOT** ask the user any custom-field questions. Fill these values automatically on every case:

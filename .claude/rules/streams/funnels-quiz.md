@@ -62,7 +62,9 @@ When creating new test cases under parent_id 8694, **always ask** the user:
 
 ## Case Fields (defaults)
 
-Use the same defaults as AppNebula funnels (see `streams/funnels-appnebula.md` → "Case Fields"). Adjust per quiz-specific test type if needed.
+Custom fields are auto-filled per global defaults — see `rules/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT use AppNebula funnels' fixed field values; quiz funnels follow the same auto-fill rules as Content / Chat / Retention.
+
+Title still uses the `(AI generated)` suffix (see Naming Convention above) — that's the only Funnels-style override that applies to quiz cases.
 
 ---
 
