@@ -59,30 +59,6 @@ Applies to every stream using the `[AI Generated][...]` prefix:
 
 ---
 
-## Preconditions Format
-
-ALL environment/context data lives ONLY in preconditions. Never inline this data in steps.
-
-Required content (where applicable):
-1. **User role** (e.g. `Logged in as Admin`)
-2. **Starting page** — exact name from Figma or Jira
-3. **Pre-existing state** (e.g. `SLA Score threshold is 85`)
-4. **Domain / URL** — clickable HTML anchor, never plain-text URL
-5. **Platform** — `AppNebula` for app cases, `Web` for web cases. NEVER label app cases as "Web".
-6. **Cookie consent** (EU locale only — `Accept cookies (EU locale)`)
-7. **Test data / mock setup** — values, files, env branches
-8. **Dev notes** from Jira if relevant
-9. **External links** (Figma, LMS, etc.) — clickable HTML anchors
-10. **Dependencies** — config, role, or feature that must be set up first
-
-Format rules:
-- Use HTML — never plain text
-- Multi-item preconditions → use `<ol>` numbered list
-- All links: `<a href="URL">Label</a>` — never raw URLs
-- Use `<strong>` for explicit values and labels (e.g. `<strong>Female</strong>`, `<strong>Design:</strong>`)
-
----
-
 ## Steps Format
 
 ### Core principles
