@@ -126,12 +126,135 @@ Initial migration left the prefix-style title rules duplicated across `streams/{
 | Total | 9 | 17 |
 | Total lines (markdown) | ~1782 | ~3000 (estimated — added stream/platform content; 12-case detail preserved) |
 
-## Next Steps
+---
 
-- Test the new skill auto-trigger on representative requests:
-  - Funnel cases (palmistry, aura) → should trigger `testrail-funnels-appnebula`
-  - Quiz funnel → `testrail-funnels-quiz`
-  - CETS ticket → `testrail-jira-figma-generator` (and apply NebulaX rules via `testrail-nebulax`)
-  - Content / Chat / Retention requests → respective streams
-- Validate that the title rule clarifications (`(AI generated)` suffix vs `[AI Generated]` prefix per stream) match actual usage
-- Add API stream rules + Quiz funnel coverage details when those become active
+# Phase 2 — 4-agent migration
+
+Date: 2026-04-27
+Branch: `refactor/restructure-rules-and-skills` (commits `7f305a6`, `982a914`, `cf95162`, plus this docs commit).
+
+## Why
+
+After Phase 1, seven skills coexisted but were not equal:
+- One cross-cutting skill (`testrail-jira-figma-generator`, 654 lines) did the entire Jira → Figma → generate → review → upload pipeline.
+- Six domain skills (`testrail-content`, `testrail-chat`, `testrail-retention`, `testrail-funnels-appnebula`, `testrail-funnels-quiz`, `testrail-nebulax`) were anemic checklists — they referenced rules without adding workflow.
+
+Two structural problems:
+1. **Trigger overlap.** The cross-cutting skill claimed "Always use this skill" and the domain skills' descriptions matched the same requests. The harness was forced to pick one — the wrong skill won often enough to be a problem.
+2. **Self-review in the same context.** Step 4 (self-review) ran in the same agent context that just generated the cases. Cognitive bias → fake compliance: the reviewer passed cases the generator made even when they violated rules.
+
+## Decomposition
+
+Replaced the monolith with a thin orchestrator + 4 single-responsibility agents.
+
+```
+.claude/
+├── agents/                                     ← NEW
+│   ├── requirements-collector.md               (Atlassian MCP + WebFetch)
+│   ├── figma-analyzer.md                       (WebFetch — and Figma MCP if available)
+│   ├── test-case-author.md                     (no tools — pure generator)
+│   └── test-case-reviewer.md                   (no tools — fresh-context review)
+└── skills/
+    └── testrail-jira-figma-generator/SKILL.md  ← rewritten as 188-line orchestrator
+```
+
+The reviewer runs in a fresh agent context — it sees only the draft JSON, the rule pack, and the requirements report. It does not see how the cases were generated, which removes the cognitive bias.
+
+The 6 domain skills are deleted — the orchestrator detects stream/platform from the ticket prefix and destination, then loads the matching rule pack at runtime (`rules/streams/<stream>.md` + `rules/products/nebulax.md` if NebulaX + `rules/platforms/<platform>.md` if applicable). No domain behavior is lost.
+
+## Inter-agent contract
+
+- `requirements-collector` → markdown report (sections: Summary, Source, Feature purpose, User flow, Acceptance criteria, Entity inventory, Figma URLs, Gaps, Notes)
+- `figma-analyzer` → markdown report (per-frame inventory + entity/variant matrix + coverage notes + skipped frames)
+- `test-case-author` → fenced ```json block (TestRail API shape + `_status` / `_existing_id` / `_warning` meta)
+- `test-case-reviewer` → markdown verdict (overall, summary, blocking_issues, suggestions, coverage_gaps, stats)
+
+The orchestrator parses by section header (markdown) or fenced block (JSON). Agents do not call each other directly.
+
+## What moved where
+
+| Concern | Phase 1 location | Phase 2 location |
+|---------|-------------------|-------------------|
+| Jira ticket parsing | inside the monolith skill | `agents/requirements-collector.md` |
+| Figma frame analysis | inside the monolith skill | `agents/figma-analyzer.md` |
+| Title format rules | inside the monolith + 7 skill files | `rules/testrail-global.md` + `rules/streams/*.md` + `rules/products/nebulax.md` (already in Phase 1; agents read via rule_pack, do NOT re-state) |
+| Generation logic | inside the monolith skill | `agents/test-case-author.md` (consumes rule_pack) |
+| Self-review checklist | inside the monolith skill (Step 4) | `agents/test-case-reviewer.md` (independent context, structured verdict) |
+| Step orchestration / flag handling / TestRail upload | inside the monolith skill | `skills/testrail-jira-figma-generator/SKILL.md` (188 lines) |
+| `--draft`, `--update`, `--update --dry-run` flags | inside the monolith skill | preserved in the orchestrator skill |
+
+## Phase 2 — files changed
+
+### Created
+| Path | Lines | Purpose |
+|------|-------|---------|
+| `.claude/agents/requirements-collector.md` | 91 | Jira ticket parser (UA + EN templates) |
+| `.claude/agents/figma-analyzer.md` | 100 | Figma frame analyzer (cap 8 frames) |
+| `.claude/agents/test-case-author.md` | 117 | JSON case generator |
+| `.claude/agents/test-case-reviewer.md` | 119 | Independent reviewer |
+
+### Rewritten
+| Path | Before | After |
+|------|--------|-------|
+| `.claude/skills/testrail-jira-figma-generator/SKILL.md` | 634 lines | 188 lines |
+
+### Deleted
+| Path |
+|------|
+| `.claude/skills/testrail-content/SKILL.md` |
+| `.claude/skills/testrail-chat/SKILL.md` |
+| `.claude/skills/testrail-retention/SKILL.md` |
+| `.claude/skills/testrail-funnels-appnebula/SKILL.md` |
+| `.claude/skills/testrail-funnels-quiz/SKILL.md` |
+| `.claude/skills/testrail-nebulax/SKILL.md` |
+
+### Unchanged
+- All files under `.claude/rules/` — rules are the single source of truth and are loaded into the rule pack at runtime.
+- `.claude/settings.local.json`.
+
+## Phase 2 — file count
+
+| | After Phase 1 | After Phase 2 |
+|---|---------------|---------------|
+| Rule files | 10 | 10 |
+| Skill files | 7 | 1 |
+| Agent files | 0 | 4 |
+| Total | 17 | 15 |
+
+## Stream / platform detection
+
+The orchestrator detects the active stream from two signals:
+
+| Signal | Stream | Notes |
+|--------|--------|-------|
+| Ticket starts with `CETS-` | `nebulax` | always project_id 10 |
+| Ticket starts with `CHAT-` | ask user | Chat stream OR Quiz funnel |
+| Section under parent_id 8648 | `funnels-appnebula` | |
+| Section under parent_id 8694 | `funnels-quiz` | |
+| Section under any Content stream group | `content` | |
+| Section under any Chat stream group | `chat` | |
+| Section under any Retention stream group | `retention` | |
+| Ambiguous | ask user | never guess |
+
+Platform from suite ID: 136 → iOS, 137 → Android, 170 → Web; 486 / 176 → none.
+
+## Verification
+
+- [x] No domain skill file references remain in `rules/`
+- [x] Orchestrator does not duplicate rule content — loads rule pack per run
+- [x] Author and reviewer agent prompts contain no rule content — they consume rule_pack
+- [x] Reviewer runs in fresh context — orchestrator does not pre-bias the prompt
+- [x] Flags `--draft`, `--update <ids>`, `--update --dry-run` preserved
+- [x] AppNebula 12-case standard set still triggered (rule pack drives author behavior)
+- [x] NebulaX `custom_case_role` still required (rule pack drives author + reviewer)
+- [x] MCP server code untouched
+
+## Next steps (after this branch is merged)
+
+- Smoke-test on representative tickets:
+  - Funnel new section → triggers AppNebula auto-Jira flow via `streams/funnels-appnebula.md` rule pack
+  - CETS ticket with linked dev task → tests AC fallback in `requirements-collector`
+  - CHAT ticket with multi-frame Figma → tests frame cap behavior in `figma-analyzer`
+  - Update flow (`--update`) → tests diff + preserve-refs logic in `test-case-author`
+- Track and tighten remaining naming-convention duplicates (Funnels and NebulaX still keep their own conventions in stream/product files — genuine deltas, not duplication)
+- Add API stream rules and Quiz funnel coverage details when those become active

@@ -142,21 +142,32 @@ The marker for AI-generated cases differs by stream — three conventions in use
 
 Full rules and rationale: `.claude/rules/testrail-global.md` → "AI-generated case marker".
 
-## Skills (Slash Commands)
+## Skill (Slash Command)
 
-Available in Claude Code via `/skill-name`. Six domain skills cover the active streams/products; a seventh handles cross-cutting Jira+Figma generation.
+A single orchestrator skill — invoke via `/testrail-jira-figma-generator <TICKET-KEY>` in Claude Code.
 
 | Skill | Scope |
 |-------|-------|
-| `testrail-funnels-appnebula` | AppNebula Funnels — full suite creation (12-case standard set), per-case create/update, auto Jira task linking under `AUTOMATION-2953` |
-| `testrail-funnels-quiz` | Quiz Funnels — case creation/update; manual Jira linking |
-| `testrail-content` | Content stream across iOS / Android / AskNebula web |
-| `testrail-chat` | Chat stream across iOS / Android / AskNebula web |
-| `testrail-retention` | Retention stream across iOS / Android / AskNebula web |
-| `testrail-nebulax` | Nebula X admin panel — role-based cases, suite 176 |
-| `testrail-jira-figma-generator` | Cross-cutting workflow — generate cases from a Jira ticket + Figma frames; spans multiple streams |
+| `testrail-jira-figma-generator` | End-to-end: Jira ticket → Figma frames → generated cases → independent review → upload to TestRail. Stream/product/platform are auto-detected from the ticket prefix and destination; the matching rule pack is loaded at runtime. |
 
-Full skill definitions: `.claude/skills/{skill-name}/SKILL.md`.
+Flags: `--draft` (generate only), `--update <case_ids>` (regenerate + diff + update), `--update --dry-run` (diff only).
+
+Full definition: `.claude/skills/testrail-jira-figma-generator/SKILL.md`.
+
+## Agents
+
+The orchestrator delegates each step to a single-responsibility agent under `.claude/agents/`:
+
+| Agent | Role | Tools |
+|-------|------|-------|
+| `requirements-collector` | Parses the Jira ticket (Ukrainian + English templates), extracts AC, User Flow, feature purpose, entity inventory, all Figma URLs, and gaps | Atlassian MCP, WebFetch |
+| `figma-analyzer` | Per-frame design spec — pages, frames, CTAs, component states, modals, variants, Figma-only states. Caps at 8 frames per call | WebFetch |
+| `test-case-author` | Generates draft cases as JSON in TestRail API shape; consumes requirements + design + rule pack + destination | none (pure generator) |
+| `test-case-reviewer` | Independent verdict (pass / needs-revision); fresh context, has not seen the generation | none (pure analysis) |
+
+The author and reviewer never embed rule content — the orchestrator passes the rule pack each run. This keeps rules a single source of truth and lets agents stay generic across streams.
+
+Full definitions: `.claude/agents/{agent-name}.md`.
 
 ## Rules for Agents
 
