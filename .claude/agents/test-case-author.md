@@ -56,7 +56,7 @@ existing_cases: {optional — array of existing case JSON objects when --update 
    - `title` — per stream's title convention, with scenario tag if prefix-style. Strip filler words ("correctly", "successfully"). Use `—` to separate action from result.
    - `custom_preconds` — HTML per rule pack (role, starting page, pre-existing state, design links as `<a href>`, mock setup, dev notes, deps). Multi-item → `<ol>`.
    - `custom_steps_separated` — array of `{content, expected, additional_info, refs}`. Each step wrapped in `<p>`. Multi-action step → `<ol>` inside `content`. Enumerations → `<ul>`. Multiple distinct outcomes in `expected` → `<ul>` bullets.
-   - `type_id`, `priority_id`, `custom_*` — apply rule pack defaults; pick `priority_id` per scenario type (Happy Path → 3-4, Negative/Edge → 1-2 unless rule pack says otherwise).
+   - `type_id`, `priority_id`, `custom_*` — apply rule pack defaults verbatim. Non-Funnels: see `testrail-global.md` "Custom Fields — auto-fill defaults" (always: `type_id` 6, `custom_automation_status` 1, `custom_completion_status` 1, `custom_regression`/`smoke`/`isabtest` false; OMIT `custom_case_platform_dropdown` from payload). Pick `priority_id` per scenario type (Happy Path → 3-4, Negative/Edge → 1-2). Funnels and NebulaX have product-specific overrides — follow their stream/product files.
    - `estimate` — per rule pack guidance.
    - `custom_case_role` — REQUIRED only when stream is `nebulax`. Comma-separated string of role IDs.
    - `refs` — pass through if existing case had refs (update flow); otherwise leave empty unless rule pack mandates a Jira key (AppNebula auto-link).
@@ -83,12 +83,11 @@ Return EXACTLY one fenced JSON block. No preamble, no narration, no checklist.
     "type_id": 6,
     "priority_id": 3,
     "estimate": "10min",
-    "custom_regression": true,
+    "custom_regression": false,
     "custom_smoke": false,
     "custom_isabtest": false,
-    "custom_automation_status": 3,
-    "custom_completion_status": 2,
-    "custom_case_platform_dropdown": 4,
+    "custom_automation_status": 1,
+    "custom_completion_status": 1,
     "custom_case_role": "3",
     "refs": "",
     "_status": "new",

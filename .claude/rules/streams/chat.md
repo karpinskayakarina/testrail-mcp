@@ -70,4 +70,4 @@ Use the global non-Funnels Jira description and summary format — see `rules/te
 
 ## Custom Fields
 
-Follow the global questionnaire — see `rules/testrail-global.md`. Ask manual-vs-here first; one field at a time.
+Custom fields are auto-filled per global defaults — see `rules/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT ask the user.

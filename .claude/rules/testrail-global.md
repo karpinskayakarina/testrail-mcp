@@ -109,31 +109,26 @@ Format rules:
 
 ---
 
-## Custom Fields — questionnaire (non-Funnels suites)
+## Custom Fields — auto-fill defaults (non-Funnels suites)
 
-> **Exception:** Funnels suite 486 — fields are fixed by `streams/funnels-appnebula.md` and `streams/funnels-quiz.md`. Do NOT ask for Funnels cases.
+> **Exception:** Funnels suite 486 — fields are fixed by `streams/funnels-appnebula.md` and `streams/funnels-quiz.md`. These defaults do NOT apply to Funnels cases.
+> **Product override:** Nebula X — see `products/nebulax.md` for CETS-specific overrides if they apply.
 
-For all other suites, before creating a test case:
+Do **NOT** ask the user any custom-field questions. Fill these values automatically on every case:
 
-**Step 1 — Ask:**
-> "Do you want to fill the case fields manually in TestRail, or answer the questions here?"
+| # | Field | Default value | Notes |
+|---|-------|--------------|-------|
+| 1 | `type_id` | **6 — Functional** | Always |
+| 2 | `priority_id` | **per scenario** | Happy Path → 3 (High), critical core flow → 4 (Critical); Negative / Edge Case → 2 (Medium) or 1 (Low) |
+| 3 | `estimate` | **per case content** | 3–5 steps no mock → `3m`; 5–8 → `5m`; 8–12 + mock/env → `10m`; multi-role/external tool → `15m`; full regression → `20m` |
+| 4 | `custom_automation_status` | **1 — None** | Always |
+| 5 | `custom_completion_status` | **1 — In progress** | Always |
+| 6 | `custom_smoke` | **false** | Always |
+| 7 | `custom_regression` | **false** | Always |
+| 8 | `custom_isabtest` | **false** | Always |
+| 9 | `custom_case_platform_dropdown` | **None — omit field from payload** | Numeric value for None is TODO; safest is to NOT include the key in the JSON sent to `add_case` / `update_case` |
 
-- **Manually** → skip field questions; create case without setting these fields
-- **Here** → ask each field below ONE AT A TIME
-
-**Step 2 — Ask in order:**
-
-| # | Field | Options |
-|---|-------|---------|
-| 1 | Type (`type_id`) | Acceptance / Accessibility / Automated / Compatibility / Destructive / Functional / Other / Performance |
-| 2 | Priority (`priority_id`) | Low / Medium / High / Critical |
-| 3 | Estimate | free text, e.g. `1min`, `10min`, `30min` |
-| 4 | Automation status (`custom_automation_status`) | None / Automated / To be automated / Won't automate / Needs update / To investigate / Automated in another case / Deleted |
-| 5 | Writing status (`custom_completion_status`) | In progress / Ready for review / On review / Done / Needs to update |
-| 6 | Smoke test? (`custom_smoke`) | yes / no |
-| 7 | Regression test? (`custom_regression`) | yes / no |
-| 8 | A/B test? (`custom_isabtest`) | yes / no |
-| 9 | Platform (`custom_case_platform_dropdown`) | None / Desktop_view / Mobile_view / Both_views |
+If the user explicitly overrides any of these in the conversation (e.g. "this is a smoke case"), apply the override only for the cases mentioned and only for the current run. Do not change the defaults file from chat.
 
 ---
 
