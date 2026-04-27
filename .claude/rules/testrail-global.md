@@ -37,15 +37,25 @@ NEVER mix projects — always confirm `project_id` before any operation. Suite/s
 
 ### AI-generated case marker — product/stream specific
 
-The marker for AI-generated cases differs by stream — see stream/product files:
+The marker for AI-generated cases differs by stream:
 
 | Stream / Product | Marker convention |
 |------------------|-------------------|
-| Funnels (AppNebula, Quiz) | `(AI generated)` **suffix** at end of title |
+| Funnels (AppNebula, Quiz) | `(AI generated)` **suffix** at end of title — see `streams/funnels-appnebula.md` |
 | Content / Chat / Retention / AskNebula | `[AI Generated][Happy Path]` / `[Negative]` / `[Edge Case]` **prefix** |
-| Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix |
+| Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix — see `products/nebulax.md` |
 
-Each stream/product file documents its exact rule. Never apply both suffix and prefix to the same case.
+**Never apply both suffix and prefix to the same case.**
+
+### Prefix-style rules (Content / Chat / Retention / Nebula X)
+
+Applies to every stream using the `[AI Generated][...]` prefix:
+
+- `[AI Generated]` MUST be the first tag
+- Scenario tag (`[Happy Path]`, `[Negative]`, `[Edge Case]`) MUST be the second tag
+- Do NOT add `(AI generated)` at the end of the title — strip it if it appears after upload
+- Title under 80 characters after the tags
+- Use `—` to separate action from result (e.g. `Admin updates threshold — Expert Dashboard reflects change`)
 
 ---
 

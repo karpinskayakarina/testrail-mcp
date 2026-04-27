@@ -94,11 +94,28 @@ No conflicts saved to `_conflicts/` — every conflict was resolved via user dec
 ## Verification
 
 - [x] All old content accounted for — funnel 12-case set, NebulaX role/custom field rules, HTML validation, Jira linking, custom field questionnaire, Section→Jira mappings, qa-generator workflow all present in new structure
-- [x] No duplicate rules across files — HTML Content Validation lives in `testrail-global.md` only; per-stream Jira mappings live in their stream files only; titles/markers documented per-stream with high-level pointer in global
+- [x] No duplicate rules across files — HTML Content Validation lives in `testrail-global.md` only; per-stream Jira mappings live in their stream files only; **prefix-style title rules consolidated to global** (see Follow-up commit below)
 - [x] Skills reference rules (do not duplicate them) — every SKILL.md has a "Rules Applied" section pointing to global + stream/product/platform files; format detail is centralised in rules
 - [x] No empty placeholder files — every new file has populated content
 - [x] `_conflicts/` is empty (no conflicts left unresolved)
 - [x] MCP server code untouched (only `.claude/` modified)
+
+## Follow-up commit — title-format de-duplication
+
+Date: 2026-04-27
+
+Initial migration left the prefix-style title rules duplicated across `streams/{chat,content,retention}.md` (full block of 5 sub-rules) and three skill files (`testrail-{chat,content,retention}/SKILL.md`). Consolidated as follows:
+
+| Action | Files |
+|--------|-------|
+| Added "Prefix-style rules" section in global | `rules/testrail-global.md` |
+| Replaced full Naming Convention block with one-liner pointing to global | `rules/streams/chat.md`, `rules/streams/content.md`, `rules/streams/retention.md` |
+| Removed standalone "Title format" workflow item; renumbered subsequent items | `skills/testrail-chat/SKILL.md`, `skills/testrail-content/SKILL.md`, `skills/testrail-retention/SKILL.md` |
+
+**Known remaining duplicates (out of scope for this commit):**
+- `skills/testrail-jira-figma-generator/SKILL.md` re-states title format ~5 times (mix of rule + examples) — bigger refactor, tracked separately.
+- `streams/{chat,content,retention}.md` repeat the "always ask before linking Jira" preamble while global at line 197 already states the rule. Per-platform Jira story tables remain in stream files (legitimate, stream-specific data).
+- Funnels (`streams/funnels-appnebula.md`) and NebulaX (`products/nebulax.md`) keep their own naming conventions — these are genuine deltas, not duplication.
 
 ## File Count Comparison
 

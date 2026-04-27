@@ -35,10 +35,9 @@ Project: 6.
 3. **Apply global format** (HTML, custom fields questionnaire, content validation).
 4. **Apply Content-specific patterns** from `streams/content.md` (content types, A/B coverage, fallback states, localisation).
 5. **For platform-specific cases** — apply platform deltas from `platforms/*.md` (gestures for iOS, back button for Android, browser matrix for Web).
-6. **Title format**: `[AI Generated][Happy Path] / [Negative] / [Edge Case] <Title>` — prefix style, NO `(AI generated)` suffix.
-7. **Generate cases** — keep steps reusable across platforms; only preconditions differ.
-8. **Ask about Jira task linking** — do not auto-create. Use stream→story mapping in `streams/content.md` if user agrees.
-9. Validate HTML, then `add_case` / `update_case`.
+6. **Generate cases** — keep steps reusable across platforms; only preconditions differ. Title format follows global prefix-style rules.
+7. **Ask about Jira task linking** — do not auto-create. Use stream→story mapping in `streams/content.md` if user agrees.
+8. Validate HTML, then `add_case` / `update_case`.
 
 ## Examples
 

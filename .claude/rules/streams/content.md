@@ -20,19 +20,7 @@ Project: 6 (Nebula).
 
 ## Naming Convention
 
-AI-generated cases use the **prefix** marker (NOT the funnels suffix):
-
-```
-[AI Generated][Happy Path] <Title>
-[AI Generated][Negative] <Title>
-[AI Generated][Edge Case] <Title>
-```
-
-- `[AI Generated]` MUST be first
-- Scenario tag (`[Happy Path]`, `[Negative]`, `[Edge Case]`) MUST be second
-- Do NOT add `(AI generated)` at the end of the title — strip it if it appears after upload
-- Title under 80 characters after the tags
-- Use `—` to separate action from result (e.g. `Admin updates threshold — Expert Dashboard reflects change`)
+Uses the `[AI Generated][...]` **prefix** style — see **Prefix-style rules** in `rules/testrail-global.md`. No stream-specific deltas.
 
 ---
 

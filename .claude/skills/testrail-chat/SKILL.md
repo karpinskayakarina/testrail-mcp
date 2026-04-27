@@ -35,10 +35,9 @@ Project: 6.
 3. **Apply global format** (HTML, custom fields questionnaire, content validation).
 4. **Apply Chat-specific patterns** from `streams/chat.md` (real-time delivery, message states, offline behavior, push, typing).
 5. **Apply platform deltas** when generating per-platform variants.
-6. **Title format**: `[AI Generated][Happy Path] / [Negative] / [Edge Case] <Title>` — prefix style.
-7. **Generate cases** — reusable steps, platform-specific preconditions.
-8. **Ask about Jira task linking** — use stream→story mapping in `streams/chat.md` if user agrees.
-9. Validate HTML, then `add_case` / `update_case`.
+6. **Generate cases** — reusable steps, platform-specific preconditions. Title format follows global prefix-style rules.
+7. **Ask about Jira task linking** — use stream→story mapping in `streams/chat.md` if user agrees.
+8. Validate HTML, then `add_case` / `update_case`.
 
 ## Examples
 
