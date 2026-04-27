@@ -19,9 +19,9 @@
 
 ## Naming Convention
 
-All AI-generated quiz funnel cases MUST end with `(AI generated)` **suffix** at the end of the title (same as AppNebula Funnels).
+Uses the `[AI Generated][...]` **prefix** style — see **Prefix-style rules** in `rules/testrail-global.md`. Same convention as Content / Chat / Retention.
 
-> Funnels (both AppNebula and Quiz) are the only streams using a suffix marker. All other streams use `[AI Generated][...]` prefix — see global rules.
+> Only AppNebula Funnels (parent_id 8648) keeps the `(AI generated)` suffix marker. Quiz Funnels do NOT.
 
 ---
 
@@ -64,7 +64,7 @@ When creating new test cases under parent_id 8694, **always ask** the user:
 
 Custom fields are auto-filled per global defaults — see `rules/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT use AppNebula funnels' fixed field values; quiz funnels follow the same auto-fill rules as Content / Chat / Retention.
 
-Title still uses the `(AI generated)` suffix (see Naming Convention above) — that's the only Funnels-style override that applies to quiz cases.
+No Funnels-style overrides apply to quiz cases — title, custom fields, and HTML format all match the global non-Funnels conventions.
 
 ---
 

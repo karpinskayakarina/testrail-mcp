@@ -41,13 +41,13 @@ The marker for AI-generated cases differs by stream:
 
 | Stream / Product | Marker convention |
 |------------------|-------------------|
-| Funnels (AppNebula, Quiz) | `(AI generated)` **suffix** at end of title — see `streams/funnels-appnebula.md` |
-| Content / Chat / Retention / AskNebula | `[AI Generated][Happy Path]` / `[Negative]` / `[Edge Case]` **prefix** |
+| AppNebula Funnels | `(AI generated)` **suffix** at end of title — see `streams/funnels-appnebula.md` |
+| Content / Chat / Retention / Quiz Funnels / AskNebula | `[AI Generated][Happy Path]` / `[Negative]` / `[Edge Case]` **prefix** |
 | Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix — see `products/nebulax.md` |
 
 **Never apply both suffix and prefix to the same case.**
 
-### Prefix-style rules (Content / Chat / Retention / Nebula X)
+### Prefix-style rules (Content / Chat / Retention / Quiz Funnels / Nebula X)
 
 Applies to every stream using the `[AI Generated][...]` prefix:
 
