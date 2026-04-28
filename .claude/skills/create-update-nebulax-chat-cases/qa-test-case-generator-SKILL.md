@@ -5,8 +5,8 @@ description: >
   Trigger whenever a user sends a Jira ticket key (e.g. CETS-123), asks to "generate test cases", "write test cases for this ticket",
   "create test cases from Jira", "update test cases", "regenerate test cases", "fix existing test cases", or mentions uploading/updating QA cases in TestRail.
   Also trigger when the user says things like "покрий тікет тест-кейсами", "згенеруй тест-кейси для CETS-XXX",
-  "онови тест-кейси", "перегенеруй тест-кейси", or similar QA task generation/update requests.
   Always use this skill — do not try to generate or update test cases ad-hoc without it.
+  "онови тест-кейси", "перегенеруй тест-кейси", or similar QA task generation/update requests.
 ---
 
 # QA Test Case Generator — NebulaX / CETS / CHAT / AskNebula / Nebula iOS / Nebula Android
@@ -126,6 +126,7 @@ The description field in Jira follows a structured template. Extract ALL of the 
 - **Summary** — used as context for test case titles
 - **Умови А/В тесту** - AB test rules
 - **Посилання на Growthbook Feature** - link to the feature in GrowthBook
+In case you can't find such blocks in Jira task, analyse all Jira task.
 Do NOT limit generation to Acceptance Criteria only — all sections above contribute to coverage.
 
 **If the ticket type is QA and has no Acceptance Criteria:**
