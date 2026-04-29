@@ -2,7 +2,7 @@
 
 > **Scope:** Nebula X — separate TestRail project (id 10), suite 176.
 
-Inherits all global format rules (see `rules/testrail-global.md`). This file lists Nebula X-specific deltas only.
+Inherits all global format rules (see `_shared/testrail-global.md`). This file lists Nebula X-specific deltas only.
 
 ---
 

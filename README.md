@@ -87,7 +87,7 @@ custom_steps_separated: [
 ]
 ```
 
-**Custom field numeric mappings** (see `.claude/rules/testrail-global.md` for full reference):
+**Custom field numeric mappings** (see `.claude/skills/_shared/testrail-global.md` for full reference):
 
 | Field | Values |
 |-------|--------|
@@ -140,7 +140,7 @@ The marker for AI-generated cases differs by stream — three conventions in use
 | Content / Chat / Retention | `[AI Generated][Happy Path]` / `[Negative]` / `[Edge Case]` **prefix** |
 | Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated]` prefix |
 
-Full rules and rationale: `.claude/rules/testrail-global.md` → "AI-generated case marker".
+Full rules and rationale: `.claude/skills/_shared/testrail-global.md` → "AI-generated case marker".
 
 ## Skill (Slash Command)
 
@@ -169,18 +169,20 @@ The author and reviewer never embed rule content — the orchestrator passes the
 
 Full definitions: `.claude/agents/{agent-name}.md`.
 
-## Rules for Agents
+## Reference packs for agents
 
-Rules live in `.claude/rules/` and are organized in four layers:
+Reference packs live in `.claude/skills/_shared/` and are organized in four layers:
 
 | Layer | Path | Content |
 |---|---|---|
-| Global | `testrail-global.md` | TestRail field IDs, priority/type/automation mappings, AI-generated marker conventions, prefix-style rules, HTML validation, Jira task standards. **Always loaded.** |
+| Global | `testrail-global.md` | TestRail field IDs, priority/type/automation mappings, AI-generated marker conventions, prefix-style rules, HTML validation, Jira task standards |
 | Stream | `streams/{content,chat,retention,funnels-appnebula,funnels-quiz}.md` | Per-stream entity model, test patterns, Jira story mappings, stream-specific deltas |
 | Product | `products/nebulax.md` | Nebula X role mapping, title prefix combinations, single-suite mode, NebulaX-only custom fields |
 | Platform | `platforms/{ios,android,web}.md` | Behavioral deltas only — gestures, permissions, browser matrix, cookie consent |
 
-Skills reference rules — they do not duplicate them. See `.claude/MIGRATION_REPORT.md` for the rationale and migration history.
+These files are **read on demand** by the orchestrator (`testrail-jira-figma-generator`) — not auto-loaded into every conversation context. The orchestrator concatenates the relevant pack and passes it to the author and reviewer agents as the `rule_pack` input. This keeps the active context lean while preserving a single source of truth.
+
+See `.claude/MIGRATION_REPORT.md` for the rationale and migration history.
 
 ## Local Development
 

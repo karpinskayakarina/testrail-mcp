@@ -19,11 +19,11 @@ If no `cloudId` is provided, default to `676994ec-3063-4a4c-87a0-a41e1b04d5c6` (
 ## Workflow
 
 1. **Fetch the ticket** via `mcp__claude_ai_Atlassian__getJiraIssue` with the provided key.
-2. **Detect language** of the description. The description follows one of two templates:
-   - **Ukrainian template** — section headers: `Детальний опис`, `Призначення фічі`, `Базові сценарії використання (User Flow)`, `Як працює функціонал (Acceptance criteria)`
-   - **English template** — section headers: `Description`, `Acceptance Criteria`, `User Flow`, `Feature purpose`
+2. **Detect language** of the description. The description follows one of two templates, but section headers vary across teams — accept all known synonyms:
+   - **Ukrainian template** — primary headers: `Детальний опис`, `Призначення фічі` (or `Скоп`), `Базові сценарії використання (User Flow)`, `Як працює функціонал (Acceptance criteria)` (or `Вимоги:`). Optional: `Умови А/В тесту` (AB test rules), `Посилання на Growthbook Feature` (GrowthBook feature flag link).
+   - **English template** — primary headers: `Description`, `Feature purpose` (or `Scope`), `User Flow`, `Acceptance Criteria` (or `Requirements`). Optional: `A/B test rules`, `GrowthBook feature link`.
 3. **Parse the body** field. Atlassian MCP returns ADF (Atlassian Document Format) — walk the node tree and convert to plain text per section.
-4. **Extract sections**. For each section header found, capture every paragraph, list, and table beneath it until the next header.
+4. **Extract sections**. For each section header found, capture every paragraph, list, and table beneath it until the next header. **If none of the expected headers are present**, parse the whole description as a single block and treat it as the AC source — note that in `AC source` as `self:unstructured`.
 5. **Collect Figma URLs**. Scan the ENTIRE description (every section, every list item, every table cell) and the ticket comments. Capture every URL matching `https://(www\.)?figma\.com/...`. De-duplicate but preserve discovery order.
 6. **Build entity inventory**. Identify the key objects mentioned in AC + User Flow (messages, cards, users, notifications, payments, reports, etc.). For each entity, note every variant/state mentioned in the requirements (e.g. messages → text, voice, image, deleted; users → client, expert, admin).
 7. **Identify gaps**. List concrete questions for items where AC describes the outcome but not the trigger, where a UI flow is implied but not described, or where a cross-role behavior is documented for one side only.
@@ -57,7 +57,13 @@ Return ONLY this markdown block. No preamble, no narration, no closing remarks.
 {verbatim contents of "Базові сценарії використання" / "User Flow" — preserve numbering}
 
 ## Acceptance criteria
-{verbatim contents of "Як працює функціонал (Acceptance criteria)" / "Acceptance Criteria" — preserve numbering}
+{verbatim contents of "Як працює функціонал (Acceptance criteria)" / "Acceptance Criteria" / "Вимоги" / "Requirements" — preserve numbering}
+
+## A/B test rules
+{verbatim contents of "Умови А/В тесту" / "A/B test rules" — or `(none)` if absent}
+
+## GrowthBook feature
+{link from "Посилання на Growthbook Feature" / "GrowthBook feature link" — or `(none)` if absent}
 
 ## Entity inventory
 - {Entity 1}: {variant a, variant b, variant c, …}

@@ -20,7 +20,7 @@ Project: 6 (Nebula).
 
 ## Naming Convention
 
-Uses the `[AI Generated][...]` **prefix** style — see **Prefix-style rules** in `rules/testrail-global.md`. No stream-specific deltas.
+Uses the `[AI Generated][...]` **prefix** style — see **Prefix-style rules** in `_shared/testrail-global.md`. No stream-specific deltas.
 
 ---
 
@@ -42,9 +42,9 @@ Core test logic (steps) should be IDENTICAL across iOS, Android, and Web for the
 Only preconditions differ — platform name, specific UI selectors, page names.
 
 Platform deltas:
-- `rules/platforms/ios.md`
-- `rules/platforms/android.md`
-- `rules/platforms/web.md`
+- `_shared/platforms/ios.md`
+- `_shared/platforms/android.md`
+- `_shared/platforms/web.md`
 
 ---
 
@@ -61,10 +61,10 @@ If yes — use the per-platform Retention stream story:
 | Android | Mobile: Android (137), group_id 13733 | `AUTOMATION-502` |
 | Web | AskNebula (170), group_id 8692 | `AUTOMATION-998` |
 
-Use the global non-Funnels Jira description and summary format — see `rules/testrail-global.md`.
+Use the global non-Funnels Jira description and summary format — see `_shared/testrail-global.md`.
 
 ---
 
 ## Custom Fields
 
-Custom fields are auto-filled per global defaults — see `rules/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT ask the user.
+Custom fields are auto-filled per global defaults — see `_shared/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT ask the user.

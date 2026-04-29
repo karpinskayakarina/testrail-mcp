@@ -1,7 +1,7 @@
 # Stream Rules — AppNebula Funnels
 
 > **Scope:** AppNebula Funnels — Nebula project (id 6) → Funnels suite (id 486) → AppNebula Funnels section (parent_id 8648).
-> Quiz funnels (parent_id 8694) — see `streams/funnels-quiz.md`.
+> Quiz funnels (parent_id 8694) — see `_shared/streams/funnels-quiz.md`.
 
 **Reference section:** Palmistry (AI generated), section_id 62173 — format reference for all cases.
 
@@ -308,7 +308,7 @@ Key rules:
 
 ## Steps Format — funnel-specific notes
 
-(General steps format and HTML rules are in `rules/testrail-global.md`.)
+(General steps format and HTML rules are in `_shared/testrail-global.md`.)
 
 ### Core principles
 - All custom/funnel-specific data belongs in Preconditions (Test data), not in steps
@@ -369,7 +369,7 @@ Estimate:
 ## Jira Task Linking — automatic for new funnel sections
 
 > **Scope:** AppNebula Funnels only — sections under parent_id 8648.
-> Quiz funnels (parent_id 8694) — see `streams/funnels-quiz.md` (manual ask).
+> Quiz funnels (parent_id 8694) — see `_shared/streams/funnels-quiz.md` (manual ask).
 
 When creating a brand-new section under parent_id 8648 for a funnel that has **no existing cases**, automatically create and link a Jira automation task.
 

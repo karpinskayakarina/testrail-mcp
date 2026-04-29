@@ -1,7 +1,7 @@
 # Stream Rules — Quiz Funnels
 
 > **Scope:** Quiz funnels — Nebula project (id 6) → Funnels suite (id 486) → Quiz funnels section (parent_id 8694).
-> AppNebula Funnels (parent_id 8648) — see `streams/funnels-appnebula.md`.
+> AppNebula Funnels (parent_id 8648) — see `_shared/streams/funnels-appnebula.md`.
 
 **Team:** Chat-growth stream QA.
 
@@ -19,7 +19,7 @@
 
 ## Naming Convention
 
-Uses the `[AI Generated][...]` **prefix** style — see **Prefix-style rules** in `rules/testrail-global.md`. Same convention as Content / Chat / Retention.
+Uses the `[AI Generated][...]` **prefix** style — see **Prefix-style rules** in `_shared/testrail-global.md`. Same convention as Content / Chat / Retention.
 
 > Only AppNebula Funnels (parent_id 8648) keeps the `(AI generated)` suffix marker. Quiz Funnels do NOT.
 
@@ -55,14 +55,14 @@ When creating new test cases under parent_id 8694, **always ask** the user:
 
 > "Should a Jira task be created and linked to these cases?"
 
-- If **yes** → ask the user which story/epic to link under, then create with the global non-Funnels description and summary format (see `rules/testrail-global.md`)
+- If **yes** → ask the user which story/epic to link under, then create with the global non-Funnels description and summary format (see `_shared/testrail-global.md`)
 - If **no** → skip Jira linking
 
 ---
 
 ## Case Fields (defaults)
 
-Custom fields are auto-filled per global defaults — see `rules/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT use AppNebula funnels' fixed field values; quiz funnels follow the same auto-fill rules as Content / Chat / Retention.
+Custom fields are auto-filled per global defaults — see `_shared/testrail-global.md` → "Custom Fields — auto-fill defaults". Do NOT use AppNebula funnels' fixed field values; quiz funnels follow the same auto-fill rules as Content / Chat / Retention.
 
 No Funnels-style overrides apply to quiz cases — title, custom fields, and HTML format all match the global non-Funnels conventions.
 
@@ -70,7 +70,7 @@ No Funnels-style overrides apply to quiz cases — title, custom fields, and HTM
 
 ## DO / DON'T
 
-Same as `streams/funnels-appnebula.md`, with these differences:
+Same as `_shared/streams/funnels-appnebula.md`, with these differences:
 - Do NOT auto-create Jira tasks — always ask
 - No 12-case standard set; coverage is quiz-specific
 - No subscription price mapping required (unless quiz funnel has paywall)

@@ -3,9 +3,9 @@
 > **Scope:** ALL projects, suites, and streams. Single source of truth for formatting, custom fields, and standards. Stream/product/platform files contain DELTAS only.
 
 This file contains rules that apply everywhere. For domain-specific rules see:
-- Streams: `rules/streams/{content,chat,retention,funnels-appnebula,funnels-quiz}.md`
-- Products: `rules/products/nebulax.md`
-- Platforms: `rules/platforms/{ios,android,web}.md`
+- Streams: `_shared/streams/{content,chat,retention,funnels-appnebula,funnels-quiz}.md`
+- Products: `_shared/products/nebulax.md`
+- Platforms: `_shared/platforms/{ios,android,web}.md`
 
 ---
 
@@ -41,9 +41,9 @@ The marker for AI-generated cases differs by stream:
 
 | Stream / Product | Marker convention |
 |------------------|-------------------|
-| AppNebula Funnels | `(AI generated)` **suffix** at end of title — see `streams/funnels-appnebula.md` |
+| AppNebula Funnels | `(AI generated)` **suffix** at end of title — see `_shared/streams/funnels-appnebula.md` |
 | Content / Chat / Retention / Quiz Funnels / AskNebula | `[AI Generated][Happy Path]` / `[Negative]` / `[Edge Case]` **prefix** |
-| Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix — see `products/nebulax.md` |
+| Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix — see `_shared/products/nebulax.md` |
 
 **Never apply both suffix and prefix to the same case.**
 
@@ -87,9 +87,9 @@ Applies to every stream using the `[AI Generated][...]` prefix:
 
 ## Custom Fields — auto-fill defaults (non-Funnels suites)
 
-> **Exception:** AppNebula Funnels (parent_id 8648) — fields are fixed by `streams/funnels-appnebula.md`. These defaults do NOT apply to AppNebula funnel cases.
-> **Quiz Funnels (parent_id 8694):** follow these global defaults (the only Funnels-style override is the `(AI generated)` title suffix — see `streams/funnels-quiz.md`).
-> **Product override:** Nebula X — see `products/nebulax.md` for CETS-specific overrides if they apply.
+> **Exception:** AppNebula Funnels (parent_id 8648) — fields are fixed by `_shared/streams/funnels-appnebula.md`. These defaults do NOT apply to AppNebula funnel cases.
+> **Quiz Funnels (parent_id 8694):** follow these global defaults (the only Funnels-style override is the `(AI generated)` title suffix — see `_shared/streams/funnels-quiz.md`).
+> **Product override:** Nebula X — see `_shared/products/nebulax.md` for CETS-specific overrides if they apply.
 
 Do **NOT** ask the user any custom-field questions. Fill these values automatically on every case:
 
@@ -174,8 +174,8 @@ Applies to Funnels, AskNebula, Mobile, API, and any future suite.
 Never include `(AI generated)` in any Jira task summary. Strip the suffix from case titles before composing the summary.
 
 ### Linking — stream-specific
-- **AppNebula Funnels (suite 486, parent_id 8648)** → automatic Jira task creation, see `streams/funnels-appnebula.md`
-- **Quiz funnels (parent_id 8694)** → ask user, see `streams/funnels-quiz.md`
+- **AppNebula Funnels (suite 486, parent_id 8648)** → automatic Jira task creation, see `_shared/streams/funnels-appnebula.md`
+- **Quiz funnels (parent_id 8694)** → ask user, see `_shared/streams/funnels-quiz.md`
 - **Content / Chat / Retention** (across iOS / Android / AskNebula Web) → ask user; section→Jira story mappings in respective stream files
 - **API / other** → ask user, no preset mapping
 

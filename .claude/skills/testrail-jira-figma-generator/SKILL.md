@@ -5,7 +5,9 @@ description: Orchestrates a 4-agent pipeline (requirements-collector → figma-a
 
 # TestRail — Jira → Figma Orchestrator
 
-Thin orchestrator. Domain logic lives in agents (`.claude/agents/*.md`) and rules (`.claude/rules/**/*.md`). This skill wires them together.
+Thin orchestrator. Domain logic lives in agents (`.claude/agents/*.md`) and shared reference packs (`.claude/skills/_shared/**/*.md`). This skill wires them together.
+
+> **Why `_shared/` and not `.claude/rules/`:** rule files placed under `.claude/rules/` are auto-loaded into every Claude Code conversation, which bloats context. `_shared/` is read on-demand only when this orchestrator runs — the agents that need rules receive them as `rule_pack` input.
 
 ## Command syntax
 
@@ -29,18 +31,19 @@ Where should I upload?
 3. Other — provide project_id and section_id
 ```
 
-Detect `stream` from ticket prefix and destination:
+Detect `stream` from destination project + ticket prefix + section path. Apply rules in order — first match wins:
 
-| Signal | Stream | Notes |
-|--------|--------|-------|
-| Ticket starts with `CETS-` | `nebulax` | project_id 10 |
-| Ticket starts with `CHAT-` | ask user: Chat stream or Quiz funnel? |
-| Section under AppNebula Funnels (parent_id 8648) | `funnels-appnebula` | |
-| Section under Quiz funnels (parent_id 8694) | `funnels-quiz` | |
-| Section under any `Content stream` group | `content` | |
-| Section under any `Chat stream` group | `chat` | |
-| Section under any `Retention stream` group | `retention` | |
-| Ambiguous | ask the user — never guess | |
+| # | Signal | Stream | Notes |
+|---|--------|--------|-------|
+| 1 | Destination `project_id == 10` | `nebulax` | NebulaX is single-suite (176). Project-level override — ignores ticket prefix and section. A `CHAT-` ticket uploaded into project 10 is still `nebulax`, NOT the Nebula Chat stream. |
+| 2 | Destination `project_id == 6` AND ticket starts with `CETS-` | error | CETS tickets belong to NebulaX (project 10). Surface error and ask the user to recheck destination. |
+| 3 | Section under AppNebula Funnels (parent_id 8648) | `funnels-appnebula` | |
+| 4 | Section under Quiz funnels (parent_id 8694) | `funnels-quiz` | |
+| 5 | Section under any `Content stream` group (Web 13800 / iOS 2228 / Android 13734) | `content` | |
+| 6 | Section under any `Chat stream` group (Web 7653 / iOS 2163 / Android 13735) | `chat` | Project 6 only — the NebulaX project (10) does NOT have a Chat stream group; rule 1 wins for project 10. |
+| 7 | Section under any `Retention stream` group (Web 8692 / iOS 2229 / Android 13733) | `retention` | |
+| 8 | Ticket starts with `CHAT-` AND no section group matched | ask user: Chat stream or Quiz funnel? | |
+| 9 | Ambiguous | ask the user — never guess | |
 
 Detect `platform` from destination suite:
 - Suite 136 → `ios`
@@ -57,10 +60,10 @@ Call `mcp__claude_ai_Testrail_MCP_2__get_case` for each ID. If any ID is missing
 ## STEP 1 — load rule pack
 
 Read and concatenate (in this order):
-1. `.claude/rules/testrail-global.md` — always
-2. `.claude/rules/streams/<stream>.md` — the detected stream
-3. `.claude/rules/products/nebulax.md` — only when `stream == "nebulax"`
-4. `.claude/rules/platforms/<platform>.md` — only when `platform != "none"`
+1. `.claude/skills/_shared/testrail-global.md` — always
+2. `.claude/skills/_shared/streams/<stream>.md` — the detected stream
+3. `.claude/skills/_shared/products/nebulax.md` — only when `stream == "nebulax"`
+4. `.claude/skills/_shared/platforms/<platform>.md` — only when `platform != "none"`
 
 Concatenate the file contents (with file path headers) into the `rule_pack` string. This is what the author and reviewer agents will receive.
 
@@ -184,5 +187,5 @@ Do not print agent reports verbatim, do not print intermediate JSON, do not narr
 
 - The reviewer runs in a fresh agent context — do not pre-bias it with the author's intent.
 - Never call MCP tools yourself for content fetching — delegate to agents. The orchestrator only calls TestRail MCP for `get_case` (Step 0b) and `add_case` / `update_case` (Step 7).
-- Never duplicate rules in this skill — the rule pack is loaded fresh each run from `.claude/rules/**`.
+- Never duplicate rules in this skill — the rule pack is loaded fresh each run from `.claude/skills/_shared/**`.
 - Update mode never auto-deletes — REMOVED cases are flagged for manual review only.
