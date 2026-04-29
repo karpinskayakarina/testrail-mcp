@@ -142,17 +142,20 @@ The marker for AI-generated cases differs by stream — three conventions in use
 
 Full rules and rationale: `.claude/skills/_shared/testrail-global.md` → "AI-generated case marker".
 
-## Skill (Slash Command)
+## Skills (Slash Commands)
 
-A single orchestrator skill — invoke via `/testrail-jira-figma-generator <TICKET-KEY>` in Claude Code.
+Two user-facing skills cover the two distinct flows:
 
-| Skill | Scope |
-|-------|-------|
-| `testrail-jira-figma-generator` | End-to-end: Jira ticket → Figma frames → generated cases → independent review → upload to TestRail. Stream/product/platform are auto-detected from the ticket prefix and destination; the matching rule pack is loaded at runtime. |
+| Skill | When to use | Entry point |
+|-------|-------------|-------------|
+| `testrail-jira-figma-generator` | **Jira-driven flow** — a Jira ticket exists, AC drives generation, Figma usually present. Covers Content / Chat / Retention / NebulaX / Quiz funnels and feature-specific work inside AppNebula funnels. | `/testrail-jira-figma-generator <TICKET-KEY>` |
+| `create-funnel-cases-appnebula` | **AppNebula funnel standard 12-set** — funnel slug is the entry point, no Jira required, code lookup for prices/email/userData, auto-Jira creation for new sections. | `/create-funnel-cases-appnebula <funnel-slug>` |
 
-Flags: `--draft` (generate only), `--update <case_ids>` (regenerate + diff + update), `--update --dry-run` (diff only).
+Both skills support `--draft` (generate only), `--update` (regenerate + diff + update), and `--update --dry-run` (diff only).
 
-Full definition: `.claude/skills/testrail-jira-figma-generator/SKILL.md`.
+The orchestrator pipeline (`testrail-jira-figma-generator`) delegates each step to a sub-agent. The funnel skill (`create-funnel-cases-appnebula`) does template-based substitution **inline** — no author agent — and only delegates the QA pass to the reviewer agent.
+
+Full definitions: `.claude/skills/{skill-name}/SKILL.md`.
 
 ## Agents
 

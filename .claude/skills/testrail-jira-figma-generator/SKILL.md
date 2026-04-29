@@ -9,6 +9,12 @@ Thin orchestrator. Domain logic lives in agents (`.claude/agents/*.md`) and shar
 
 > **Why `_shared/` and not `.claude/rules/`:** rule files placed under `.claude/rules/` are auto-loaded into every Claude Code conversation, which bloats context. `_shared/` is read on-demand only when this orchestrator runs — the agents that need rules receive them as `rule_pack` input.
 
+## When NOT to use this skill
+
+- **AppNebula funnel standard 12-case set** (parent_id 8648, e.g. "create cases for Aura funnel") → use `create-funnel-cases-appnebula` instead. That skill does template-based generation inline, runs the funnel-specific Q&A (prices, scan, email, upsell, userData), and handles the auto-Jira flow for new funnel sections.
+
+This orchestrator stays useful for funnels when the work is **feature-driven** by a Jira ticket (e.g. "ALPHA-1234 — change paywall layout in Aura funnel"). In that case the AC drives generation, not the 12-set template.
+
 ## Command syntax
 
 | Input | Behavior |
@@ -37,7 +43,7 @@ Detect `stream` from destination project + ticket prefix + section path. Apply r
 |---|--------|--------|-------|
 | 1 | Destination `project_id == 10` | `nebulax` | NebulaX is single-suite (176). Project-level override — ignores ticket prefix and section. A `CHAT-` ticket uploaded into project 10 is still `nebulax`, NOT the Nebula Chat stream. |
 | 2 | Destination `project_id == 6` AND ticket starts with `CETS-` | error | CETS tickets belong to NebulaX (project 10). Surface error and ask the user to recheck destination. |
-| 3 | Section under AppNebula Funnels (parent_id 8648) | `funnels-appnebula` | |
+| 3 | Section under AppNebula Funnels (parent_id 8648) | `funnels-appnebula` | Feature-driven only — author treats this as AC-driven, not the 12-set. If the user wanted the standard set, redirect to `create-funnel-cases-appnebula`. |
 | 4 | Section under Quiz funnels (parent_id 8694) | `funnels-quiz` | |
 | 5 | Section under any `Content stream` group (Web 13800 / iOS 2228 / Android 13734) | `content` | |
 | 6 | Section under any `Chat stream` group (Web 7653 / iOS 2163 / Android 13735) | `chat` | Project 6 only — the NebulaX project (10) does NOT have a Chat stream group; rule 1 wins for project 10. |
