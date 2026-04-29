@@ -62,9 +62,11 @@ Look up in code first — ask the user only what's missing:
 https://appnebula.co/{locale_code_lowercase}/{funnel}/prelanding?utm_source=fb
 ```
 
-### Step 6 — Create Jira task for locale cases
+### Step 6 — Jira task for locale cases
 
-Each (funnel, locale) pair gets its own Jira task under `AUTOMATION-2953`.
+Ask: "Should I create a Jira task for these locale cases, or do you have an existing one to link?"
+
+**If creating a new task:**
 
 1. **Duplicate check** — search for an existing task:
    ```
@@ -77,6 +79,11 @@ Each (funnel, locale) pair gets its own Jira task under `AUTOMATION-2953`.
 3. Set `refs = JIRA_KEY` on both locale cases before calling `add_case`.
 
 4. If Jira API fails → retry once; if still failing → create cases without `refs` and report in summary.
+
+**If linking an existing task:**
+
+1. Ask: "What is the Jira task key to link? (e.g. AUTOMATION-1234)"
+2. Set `refs = that key` on both locale cases before calling `add_case`.
 
 ### Step 7 — Build and create both cases
 
@@ -169,10 +176,10 @@ If Jira key was not found, note which cases are missing `refs`.
 
 ## Standard Set
 
-| # | Title pattern | priority_id | custom_automation_status |
-|---|---------------|-------------|--------------------------|
-| 1 | Check successful payments and emails for {LOCALE} locale ({REGION}) (AI generated) | 4 | 3 (To be automated) |
-| 2 | Check flow for user with additional discount payment for {LOCALE} locale ({REGION}) (AI generated) | 5 | 3 (To be automated) |
+| # | Title pattern | priority | custom_automation_status | estimate |
+|---|---------------|----------|--------------------------|----------|
+| 1 | Check successful payments and emails for {LOCALE} locale ({REGION}) (AI generated) | Critical | 3 (To be automated) | 15min |
+| 2 | Check flow for user with additional discount payment for {LOCALE} locale ({REGION}) (AI generated) | Medium | 3 (To be automated) | 5min |
 
 ## Case Fields
 
@@ -184,8 +191,10 @@ custom_case_platform_dropdown: 4
 custom_smoke: false
 custom_regression: true
 custom_isabtest: false
-estimate: "10min"
+custom_automation_status: 3
 ```
+
+`priority_id` and `estimate` — per-case, see Standard Set table above.
 
 ## Subscription Prices
 
@@ -209,4 +218,3 @@ Use this table to look up an existing case of the same locale in another funnel 
 ## DO NOT
 - Do NOT hardcode any specific locale (PT/ES/DE/etc.) — always read it from the user's answer.
 - Do NOT put any locale-specific value in steps; everything specific belongs in Preconditions. **Exception:** the localized "Get secret discount" button text in Case 2 step 3.
-- Do NOT use `priority_id: 4` for Case 2 — Case 2 is `priority_id: 5`.
