@@ -1,10 +1,9 @@
 # TestRail Global Rules
 
-> **Scope:** ALL projects, suites, and streams. Single source of truth for formatting, custom fields, and standards. Stream/product/platform files contain DELTAS only.
+> **Scope:** ALL projects, suites, and streams. Single source of truth for formatting, custom fields, and standards. Stream/platform files contain DELTAS only.
 
 This file contains rules that apply everywhere. For domain-specific rules see:
-- Streams: `_shared/streams/{content,chat,retention,funnels-appnebula,funnels-quiz}.md`
-- Products: `_shared/products/nebulax.md`
+- Streams: `_shared/streams/{content,chat,retention,funnels-appnebula,funnels-quiz,nebulax}.md`
 - Platforms: `_shared/platforms/{ios,android,web}.md`
 
 ---
@@ -43,7 +42,7 @@ The marker for AI-generated cases differs by stream:
 |------------------|-------------------|
 | AppNebula Funnels | `(AI generated)` **suffix** at end of title — see `_shared/streams/funnels-appnebula.md` |
 | Content / Chat / Retention / Quiz Funnels / AskNebula | `[AI Generated][Happy Path]` / `[Negative]` / `[Edge Case]` **prefix** |
-| Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix — see `_shared/products/nebulax.md` |
+| Nebula X | Role prefix (`[Adm]`, `[Man]`, `[Exp/Mon]`…) + `[AI Generated][Happy Path/Negative/Edge Case]` prefix — see `_shared/streams/nebulax.md` |
 
 **Never apply both suffix and prefix to the same case.**
 
@@ -89,7 +88,7 @@ Applies to every stream using the `[AI Generated][...]` prefix:
 
 > **Exception:** AppNebula Funnels (parent_id 8648) — fields are fixed by `_shared/streams/funnels-appnebula.md`. These defaults do NOT apply to AppNebula funnel cases.
 > **Quiz Funnels (parent_id 8694):** follow these global defaults (the only Funnels-style override is the `(AI generated)` title suffix — see `_shared/streams/funnels-quiz.md`).
-> **Product override:** Nebula X — see `_shared/products/nebulax.md` for CETS-specific overrides if they apply.
+> **Stream override:** Nebula X — see `_shared/streams/nebulax.md` for CETS-specific overrides if they apply.
 
 Do **NOT** ask the user any custom-field questions. Fill these values automatically on every case:
 

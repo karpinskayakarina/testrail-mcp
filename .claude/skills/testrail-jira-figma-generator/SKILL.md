@@ -67,9 +67,8 @@ Call `mcp__claude_ai_Testrail_MCP_2__get_case` for each ID. If any ID is missing
 
 Read and concatenate (in this order):
 1. `.claude/skills/_shared/testrail-global.md` — always
-2. `.claude/skills/_shared/streams/<stream>.md` — the detected stream
-3. `.claude/skills/_shared/products/nebulax.md` — only when `stream == "nebulax"`
-4. `.claude/skills/_shared/platforms/<platform>.md` — only when `platform != "none"`
+2. `.claude/skills/_shared/streams/<stream>.md` — the detected stream (`content` | `chat` | `retention` | `funnels-appnebula` | `funnels-quiz` | `nebulax`)
+3. `.claude/skills/_shared/platforms/<platform>.md` — only when `platform != "none"`
 
 Concatenate the file contents (with file path headers) into the `rule_pack` string. This is what the author and reviewer agents will receive.
 

@@ -25,7 +25,7 @@ The orchestrator passes a single message with four sections, separated by `---`:
 ---
 
 ## rule_pack
-{concatenated rule files from `.claude/skills/_shared/`: testrail-global.md + relevant streams/<stream>.md + products/nebulax.md if NebulaX + platforms/<platform>.md if applicable}
+{concatenated rule files from `.claude/skills/_shared/`: testrail-global.md + relevant streams/<stream>.md + platforms/<platform>.md if applicable}
 
 ---
 
