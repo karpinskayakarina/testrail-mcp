@@ -28,16 +28,34 @@ A Figma screenshot may be attached to the message — pass it through to the fig
 
 ## STEP 0 — destination + stream detection
 
-Ask the user (single prompt):
+Auto-detect the **project** from the ticket prefix — do NOT ask which project. Then ask only what cannot be inferred.
 
-```
-Where should I upload?
-1. NebulaX — project_id 10, section_id 73027 (AI Generated Tests)
-2. Nebula — project_id 6, section_id 69886 (AI Generated Tests)
-3. Other — provide project_id and section_id
-```
+| Ticket prefix | Project | Defaults applied without asking |
+|---|---|---|
+| `CETS-*` | NebulaX (10) | suite_id 176, section_id 73027 (AI Generated Tests) |
+| anything else | Nebula (6) | project only — section must be picked (see below) |
 
-Detect `stream` from destination project + ticket prefix + section path. Apply rules in order — first match wins:
+### CETS path — announce and proceed
+
+Print one line:
+```
+NebulaX detected. Using project_id 10, suite_id 176, section_id 73027 (AI Generated Tests). Type a different section_id to override, otherwise I'll proceed.
+```
+If the user replies with a number → use that as `section_id` (still project 10, fetch suite via `get_section` for confirmation). If the user replies anything else (or nothing) → use defaults.
+
+### Non-CETS path — ask for section
+
+Print:
+```
+Nebula (project 6) detected. Which section_id should I upload to?
+- Default: 69886 (AI Generated Tests)
+- Or provide a specific section_id under Funnels (suite 486) / AskNebula (170) / Mobile iOS (136) / Mobile Android (137)
+```
+Wait for the user. Accept either a numeric `section_id` or "default" / empty for 69886. After receiving the value, call `get_section(section_id)` to read the parent chain and `suite_id` so the stream-detection rules below have the data they need.
+
+### Stream detection
+
+Detect `stream` from project + ticket prefix + section path. Apply rules in order — first match wins:
 
 | # | Signal | Stream | Notes |
 |---|--------|--------|-------|
