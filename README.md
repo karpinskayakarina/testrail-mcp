@@ -184,8 +184,6 @@ Reference packs live in `.claude/skills/_shared/` and are organized in four laye
 
 These files are **read on demand** by the orchestrator (`testrail-jira-figma-generator`) — not auto-loaded into every conversation context. The orchestrator concatenates the relevant pack and passes it to the author and reviewer agents as the `rule_pack` input. This keeps the active context lean while preserving a single source of truth.
 
-See `.claude/MIGRATION_REPORT.md` for the rationale and migration history.
-
 ## Local Development
 
 ```bash
