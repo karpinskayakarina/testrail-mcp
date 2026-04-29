@@ -125,15 +125,55 @@ Agent({
 
 Capture the verdict.
 
-## STEP 6 — retry loop (max 2)
+## STEP 6 — incremental retry loop (max 2)
 
-If `verdict.overall == "needs-revision"`:
-- Build a feedback prompt from `blocking_issues` + `coverage_gaps`
-- Re-invoke `test-case-author` with `## reviewer_feedback\n{feedback}` appended
-- Re-invoke `test-case-reviewer` on the new draft
-- Repeat up to 2 times total
+If `verdict.overall == "needs-revision"` — re-run author **only on the failing cases**, not the whole set. This cuts retry cost ~50% on author side because the model regenerates 2-3 cases instead of 12.
 
-If still `needs-revision` after 2 retries → surface the verdict to the user with the remaining issues and ask: `proceed anyway / edit manually / cancel`.
+### 6a — build retry payload
+
+Group `verdict.blocking_issues` by `case_index`:
+```
+fix_targets = []
+for issue in verdict.blocking_issues:
+  bucket = find or create entry where entry.case_index == issue.case_index
+  bucket.blocking_issues.append(issue.description)
+  bucket.suggested_fix = issue.suggested_fix   # last-wins is fine; reviewer's suggestions tend to align
+```
+
+Map `verdict.coverage_gaps` to `new_cases_needed` (text list — one entry per uncovered AC item that the requirements report did NOT flag as out-of-scope).
+
+### 6b — invoke author in retry mode
+
+```
+Agent({
+  subagent_type: "test-case-author",
+  prompt: "## requirements\n{...}\n\n---\n\n## design\n{...}\n\n---\n\n## rule_pack\n{...}\n\n---\n\n## destination\n{...}\n\n---\n\n## fix_targets\n{JSON of fix_targets list}\n\n---\n\n## existing_draft\n{full JSON of the previous draft}\n\n---\n\n## new_cases_needed\n{list of uncovered AC items, or omit if empty}"
+})
+```
+
+The author returns ONLY the fixed cases (each with `_fix_target_index`) and any new cases (each with `_status: "new"`, no `_fix_target_index`).
+
+### 6c — merge
+
+Build the next-iteration draft:
+```
+merged = copy(existing_draft)
+for case in author_output:
+  if case._fix_target_index is not null:
+    merged[case._fix_target_index] = case      # replace the broken one
+  else:
+    merged.append(case)                         # net-new
+```
+
+`merged` is the new full draft.
+
+### 6d — re-invoke reviewer on the merged draft
+
+Same as Step 5, with the merged draft. The reviewer always sees the full set so set-level checks (duplicates, coverage, completeness) keep working.
+
+### 6e — loop
+
+Repeat 6a–6d up to 2 times total. If still `needs-revision` after 2 retries → surface the verdict to the user with the remaining issues and ask: `proceed anyway / edit manually / cancel`.
 
 ## PAUSE — show + approve
 

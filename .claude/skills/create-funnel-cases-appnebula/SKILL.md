@@ -271,15 +271,30 @@ The reviewer validates:
 - Preconditions structure (locale-correct, prices match `funnel_metadata.prices`, scan source FILE only on Case 6)
 - Per-case format reference compliance
 
-## STEP 6 — retry loop (max 2)
+## STEP 6 — incremental retry loop (max 2)
 
-If `verdict.overall == "needs-revision"`:
-- Read the `blocking_issues`
-- Fix them inline (re-run Step 4 for affected cases) — no need to call author agent
-- Re-invoke reviewer
-- Repeat up to 2 times
+If `verdict.overall == "needs-revision"` — patch only the failing cases, do not regenerate the whole array. Generation is template-based here so this is even cheaper than the orchestrator's incremental retry.
 
-If still `needs-revision` after 2 retries → surface the verdict to the user, ask `proceed anyway / edit manually / cancel`.
+### 6a — collect targets
+
+Group `verdict.blocking_issues` by `case_index` → `fix_targets`. Each target carries the list of issues + reviewer's `suggested_fix`.
+
+If `verdict.coverage_gaps` is non-empty AND it points at the standard 12-set (e.g. "Case 6 is missing although scan == true"), treat the missing case as a fix target — its `case_index` is the position it should occupy in the array per the "Standard Full Set" table; regenerate from the per-case format reference for that index. (Coverage gaps about extra requirements outside the 12-set should not happen — the funnel skill never generates AC-driven cases.)
+
+### 6b — patch each target inline
+
+For each `target` in `fix_targets`:
+1. Locate the case at `draft[target.case_index]` (or determine the right slot for a missing case).
+2. Re-apply Step 4 substitution for ONLY that case using `funnel_metadata` + the rule pack templates, applying `suggested_fix` guidance (e.g. "use 'palmistry' not 'hand' for the title token", "wrap step 3 expected in `<p>`").
+3. Replace `draft[target.case_index]` in place. Do NOT touch other slots.
+
+### 6c — re-invoke reviewer
+
+Same as Step 5, with the patched draft. Reviewer always sees the full set so it can validate set-level rules (12-set completeness, per-case format compliance, no duplicates).
+
+### 6d — loop
+
+Repeat 6a–6c up to 2 times total. If still `needs-revision` after 2 retries → surface the verdict to the user with the remaining issues and ask: `proceed anyway / edit manually / cancel`.
 
 ## PAUSE — show + approve
 

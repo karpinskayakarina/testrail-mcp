@@ -11,7 +11,7 @@ You receive ALL the rules you need in the `rule_pack` field of your input. The p
 
 ## Input contract
 
-The orchestrator passes a single message with four sections, separated by `---`:
+The orchestrator passes a single message with four required sections plus two optional ones for incremental retry, separated by `---`:
 
 ```
 ## requirements
@@ -36,7 +36,37 @@ section_id: {N}
 stream: {content | chat | retention | funnels-appnebula | funnels-quiz | nebulax}
 platform: {ios | android | web | none}
 existing_cases: {optional — array of existing case JSON objects when --update is in play}
+
+---
+
+## fix_targets        (optional — present only on retry)
+[
+  {
+    "case_index": 2,
+    "blocking_issues": ["Step 3 expected field is empty", "Title contains filler word 'correctly'"],
+    "suggested_fix": "Rewrite step 3 expected with concrete assertion; rename title to action+result."
+  },
+  ...
+]
+
+---
+
+## existing_draft     (optional — present only on retry, alongside fix_targets)
+[
+  {full JSON of every case from the previous attempt, including those NOT being fixed}
+]
+
+---
+
+## new_cases_needed   (optional — present only when reviewer flagged coverage_gaps)
+[
+  "AC item text that is uncovered in existing_draft",
+  "Another uncovered AC item",
+  ...
+]
 ```
+
+When `fix_targets` is present this is a **retry invocation**. See "Incremental retry mode" below.
 
 ## Workflow
 
@@ -67,6 +97,25 @@ existing_cases: {optional — array of existing case JSON objects when --update 
    - For existing cases with no regenerated counterpart → DO NOT include them in output; the orchestrator handles the REMOVED list
 6. **Return JSON only**. Format below.
 
+## Incremental retry mode
+
+When the input contains `## fix_targets` AND `## existing_draft` you are in retry mode. Behavior changes:
+
+1. **Do NOT regenerate the full set.** The `existing_draft` is the previous attempt; treat its cases as already-approved unless they appear in `fix_targets`.
+2. **Regenerate ONLY the cases listed in `fix_targets`**:
+   - For each target, identify the case at `existing_draft[case_index]`.
+   - Read the `blocking_issues` and `suggested_fix` for that case.
+   - Apply the fixes to that single case while preserving all other fields that were correct.
+   - Output the corrected case with the SAME `case_index` so the orchestrator can merge.
+3. **If `## new_cases_needed` is present**, generate one new case per uncovered AC item. These are appended (no `case_index` — they are net-new). Set `_status: "new"`.
+4. **Output shape on retry** is a flat JSON array containing ONLY:
+   - The fixed cases (one per `fix_targets` entry, with `_fix_target_index: {original case_index}` so the orchestrator knows which original case to replace)
+   - The new cases (with `_status: "new"`, no `_fix_target_index`)
+   
+   Cases in `existing_draft` that were NOT in `fix_targets` and NOT replaced by new ones are NOT included in the output. The orchestrator already has them.
+5. **Same field rules apply** — title format, custom fields, HTML validation. The reviewer will check the merged result.
+6. **Do NOT touch unrelated cases** even if you'd write them differently. Stay surgical.
+
 ## Output format
 
 Return EXACTLY one fenced JSON block. No preamble, no narration, no checklist.
@@ -92,11 +141,14 @@ Return EXACTLY one fenced JSON block. No preamble, no narration, no checklist.
     "refs": "",
     "_status": "new",
     "_warning": null,
-    "_existing_id": null
+    "_existing_id": null,
+    "_fix_target_index": null
   }
 ]
 ```
 ````
+
+`_fix_target_index` — present only on retry mode output. Number → matches the `case_index` from the corresponding `fix_targets` entry; the orchestrator replaces `existing_draft[that_index]` with this case. Null on first run and for net-new cases.
 
 Field rules:
 - `_status` ∈ `"new" | "updated" | "unchanged"` — for non-update flows always `"new"`.
