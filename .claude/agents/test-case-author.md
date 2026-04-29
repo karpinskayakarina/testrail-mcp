@@ -64,9 +64,26 @@ existing_cases: {optional — array of existing case JSON objects when --update 
   "Another uncovered AC item",
   ...
 ]
+
+---
+
+## cross_platform_cases   (optional — reference cases from OTHER platforms for the same feature)
+[
+  {
+    "id": 12345,
+    "platform": "ios",
+    "title": "...",
+    "custom_preconds": "<p>...</p>",
+    "custom_steps_separated": [...],
+    "refs": "..."
+  },
+  ...
+]
 ```
 
 When `fix_targets` is present this is a **retry invocation**. See "Incremental retry mode" below.
+
+When `cross_platform_cases` is present, the orchestrator has discovered existing cases on another platform (iOS / Android / Web) for the SAME feature. The stream rule pack (Content / Chat / Retention) explicitly states that core test logic — steps and expected results — should be IDENTICAL across platforms; only preconditions adapt. See "Cross-platform consistency" below.
 
 ## Workflow
 
@@ -95,7 +112,29 @@ When `fix_targets` is present this is a **retry invocation**. See "Incremental r
    - Preserve `refs`, `custom_automation_status`, and other update-protected fields per the rule pack's "Existing funnel path" guidance
    - For cases with no existing counterpart → mark `_status: "new"`
    - For existing cases with no regenerated counterpart → DO NOT include them in output; the orchestrator handles the REMOVED list
-6. **Return JSON only**. Format below.
+6. **For cross-platform consistency** — see the dedicated section below when `cross_platform_cases` is present.
+7. **Return JSON only**. Format below.
+
+## Cross-platform consistency
+
+When `## cross_platform_cases` is present in the input, the orchestrator has fetched existing TestRail cases on other platforms (iOS / Android / Web) that cover the SAME feature. The Content / Chat / Retention stream rule packs all state:
+
+> Core test logic (steps) should be IDENTICAL across iOS, Android, and Web for the same feature. Only preconditions differ — platform name, specific UI selectors, page names.
+
+Apply that rule:
+
+1. **Mirror step structure.** For each new case you generate, find the matching scenario in `cross_platform_cases` by title similarity (e.g. "Verify user can submit form" on iOS → same scenario on Web). Copy the `custom_steps_separated` array verbatim, then adapt:
+   - Replace platform-specific gestures: "tap" (iOS) ↔ "click" (Web) ↔ "tap" (Android with hardware back consideration). Use the rule pack's platform delta file for the target platform.
+   - Replace platform-specific page / screen names ONLY if Figma names differ.
+   - Keep the same number of steps, same expected outcomes, same step order.
+2. **Adapt preconditions.** Preconditions DO differ across platforms:
+   - User context: "User is logged into AskNebula iOS app" vs "User is logged into AskNebula_SPA (Web/Desktop)" vs "User is logged into AskNebula Android app".
+   - Platform-specific setup: iOS biometric auth, Android back-button paths, Web responsive viewport. Pull from the rule pack's platform delta file.
+3. **Preserve title pattern.** Use the same action+result wording but match the prefix-style convention for the current stream (`[AI Generated][Happy Path]` etc.).
+4. **Skip mirroring when no scenario match exists.** If a case in `cross_platform_cases` describes a flow that does not apply to the current platform (e.g. iOS Face ID flow on Web), do not generate a Web equivalent.
+5. **Generate net-new cases** for AC items that have no cross-platform counterpart — those follow the standard generation path.
+
+Mark cases derived from a cross-platform reference with `_warning: "mirrored from cross-platform case Cxxxxx"` so the reviewer can spot them.
 
 ## Incremental retry mode
 
@@ -160,6 +199,8 @@ Field rules:
 ## Hard rules
 
 - **Do NOT add `(AI generated)` suffix to non-Funnels titles.** Use the stream's actual convention from the rule pack.
+- **Do NOT mention the Jira ticket key (`RETENTION-920`, `CETS-3457`, …) anywhere in `custom_preconds` or `custom_steps_separated`.** The ticket lives in `refs` — that is its single home. Putting "Ticket: XXX-123" in preconditions duplicates information already linked from the case.
+- **Do NOT add a "For e2e tests / For manual tests: <browser>" line to preconditions** for non-Funnels Web cases. AppNebula funnel cases keep this line via their own preconditions template; everywhere else the test environment is implicit.
 - **Do NOT inline funnel-specific data in steps.** Prices, gender, dates, scan type — all in `custom_preconds`. Steps stay reusable.
 - **Do NOT include hex codes, font names, icon asset names, or pixel sizes** anywhere. Plain language only.
 - **Do NOT generate UI styling tests** (color, font, layout, icon visibility).

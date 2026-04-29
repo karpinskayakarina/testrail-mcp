@@ -23,6 +23,7 @@ This orchestrator stays useful for funnels when the work is **feature-driven** b
 | `... --draft` | Generate + review, show, do NOT upload |
 | `... --update 12345,12346` | Fetch existing cases, regenerate, diff, update |
 | `... --update --dry-run` | Same as --update but show diff only, no writes |
+| `... --ref-cases 12345,12346` | Cross-platform reference — fetch these existing cases (typically iOS / Android / Web counterparts of the same feature) and pass them to the author so steps mirror their structure |
 
 A Figma screenshot may be attached to the message — pass it through to the figma-analyzer.
 
@@ -90,6 +91,39 @@ Read and concatenate (in this order):
 
 Concatenate the file contents (with file path headers) into the `rule_pack` string. This is what the author and reviewer agents will receive.
 
+## STEP 1.5 — cross-platform reference cases
+
+> Only runs when `stream` is `content` / `chat` / `retention` AND `platform` is `ios` / `android` / `web`. The Content / Chat / Retention rule packs all mandate that core test logic be IDENTICAL across platforms — when iOS / Android cases already exist for the same feature, mirroring their step structure on the new platform is required, not optional. Skip this step entirely for `nebulax` / `funnels-*` streams (single-suite, platform-less).
+
+### 1.5a — explicit IDs from `--ref-cases` flag
+
+If the user invoked the orchestrator with `--ref-cases 12345,12346,...`:
+- Parse the IDs (comma-separated, accept `Cxxxx` or `https://obrio.testrail.io/...` URL formats — strip to numeric).
+- Call `mcp__claude_ai_Testrail_MCP_2__get_case` for each ID.
+- Store as `cross_platform_cases`. Skip 1.5b.
+
+### 1.5b — ask the user (when no flag)
+
+Print one prompt:
+```
+Stream is {stream}, target platform is {platform}. Does this feature already have test cases on iOS / Android / Web (other platforms) that I should use as a reference for step structure?
+
+Paste TestRail case IDs (comma-separated, e.g. `12345, 12346`) or type `no` to generate from scratch.
+```
+
+Wait for the response.
+- IDs given → fetch each via `get_case`, store as `cross_platform_cases`.
+- `no` / empty → set `cross_platform_cases = []`, continue.
+- Invalid IDs → surface error, ask again. Do not proceed until valid.
+
+### 1.5c — sanity-check the references
+
+For each fetched case:
+- Verify it is in a DIFFERENT platform's group than the current target. If it's in the same platform group → flag as warning ("reference case is on same platform as target — mirroring may not add value") but accept.
+- Verify titles look related to the current ticket (rough sanity check on the requirements summary). Flag obvious mismatches but accept the user's choice.
+
+The collected list is passed to the author in Step 4 as the `## cross_platform_cases` block.
+
 ## STEP 2 — call requirements-collector
 
 ```
@@ -126,7 +160,7 @@ Capture the design report.
 ```
 Agent({
   subagent_type: "test-case-author",
-  prompt: "## requirements\n{requirements report}\n\n---\n\n## design\n{design report}\n\n---\n\n## rule_pack\n{loaded rule pack}\n\n---\n\n## destination\nproject_id: {N}\nsuite_id: {N}\nsection_id: {N}\nstream: {stream}\nplatform: {platform}\nexisting_cases: {JSON of existing cases or omit if not --update}"
+  prompt: "## requirements\n{requirements report}\n\n---\n\n## design\n{design report}\n\n---\n\n## rule_pack\n{loaded rule pack}\n\n---\n\n## destination\nproject_id: {N}\nsuite_id: {N}\nsection_id: {N}\nstream: {stream}\nplatform: {platform}\nexisting_cases: {JSON of existing cases or omit if not --update}\n\n---\n\n## cross_platform_cases\n{JSON of cases fetched in Step 1.5, or omit the section entirely if empty}"
 })
 ```
 

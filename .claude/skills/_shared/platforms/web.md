@@ -8,16 +8,15 @@ Inherits all global rules. This file lists Web deltas only.
 
 ## Browser Compatibility
 
-Cover the supported browser matrix when test logic is browser-sensitive:
+Cover the supported browser matrix only when test logic is browser-sensitive (e.g. iOS Safari quirk, Firefox-only bug). Default browser is implicit — do NOT add a "For e2e tests: Chrome mobile / For manual tests: Chrome desktop" line to preconditions of generic Web cases. It clutters the case without adding signal.
+
+Browsers worth naming explicitly when relevant:
 - Chrome (mobile + desktop)
-- Safari (iOS Safari + macOS Safari)
+- Safari (iOS Safari + macOS Safari) — only mention for iOS Safari–specific behavior or USA-locale Funnels
 - Firefox
 - Edge
 
-Always note explicit browser in preconditions for manual tests:
-- `For e2e tests: Chrome mobile browser`
-- `For manual tests: Chrome desktop browser`
-- `For manual tests: Safari` (USA locale convention for Funnels)
+> **Funnels exception:** AppNebula Funnels keep the explicit browser line because their preconditions template mandates it (see `_shared/streams/funnels-appnebula.md` Preconditions Format). That rule overrides the default above and applies only inside funnel-skill output.
 
 ## Responsive Breakpoints
 
