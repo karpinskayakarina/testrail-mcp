@@ -1,3 +1,8 @@
+---
+name: create-funnels-locale-cases
+description: Generates 2 standard locale-specific funnel cases (Case 1 — successful payments and emails, Case 2 — additional discount flow) under a "Locales" subsection of an AppNebula or Quiz funnel (TestRail project 6, suite 486, parent_id 8648 or 8694). Trigger when input contains BOTH a funnel slug AND a locale code (e.g. "aura PT EU", "palmistry DE", "witch-power FR EU", "create locale cases for soulmate-sketch ES"), OR when input contains a TestRail Locales section_id with a locale code (e.g. "78182 PT EU"). Funnel slug ALONE — without a locale — goes to create-funnel-cases-appnebula (the standard 12-set skill). Jira ticket keys (CETS-/CHAT-/etc.) go to testrail-jira-figma-generator. Supported locale codes: PT, ES, DE, FR, IT, AR, JA, KO, ZH, RU, TR, NL, PL, SV (uppercase ISO). Region: EU or LATAM (Brazilian Portuguese is LATAM, most others EU).
+---
+
 # Create TestRail Locale Cases
 
 > **Scope:** Funnels only — suite_id: 486 (AppNebula Funnels & Quiz funnels).
