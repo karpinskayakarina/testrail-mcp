@@ -172,7 +172,6 @@ Return EXACTLY one fenced JSON block. No preamble, no narration, no checklist.
     "priority_id": 3,
     "estimate": "10min",
     "custom_regression": false,
-    "custom_smoke": false,
     "custom_isabtest": false,
     "custom_automation_status": 1,
     "custom_completion_status": 1,
@@ -205,5 +204,8 @@ Field rules:
 - **Do NOT include hex codes, font names, icon asset names, or pixel sizes** anywhere. Plain language only.
 - **Do NOT generate UI styling tests** (color, font, layout, icon visibility).
 - **Do NOT invent requirements.** If a step needs a value the requirements + design don't specify, mark the case `_warning: "missing data: <what>"` and use a placeholder like `<value from preconditions>`.
+- **Do NOT invent product terminology.** Segment values, flag names, CTA labels, page names, property keys come from Jira AC, linked configs, `cross_platform_cases`, or Figma — never derived from the feature name. See "Source-of-truth terminology" in the rule pack. If a needed string is missing from all sources → `_warning: "missing terminology: <what>"`.
+- **Use product-flow language in steps.** `Click X → Y is shown` / `Y is added to balance` — not `Backend call is fired` / `Backend marks user as Z`. Exception: cases explicitly scoped to backend or API. See "Steps Format → Core principles".
+- **Title style for prefix-style streams: `Verify <natural sentence>`** after the tags. Single action + result; em-dash only when separating one action from one result, never followed by a comma-list of multiple actions. See "Prefix-style rules" in the rule pack.
 - **Do NOT call any MCP tools.** You have no tools — you only generate.
 - **Output JSON, nothing else.** The orchestrator pipes your output directly to the reviewer and (later) TestRail.

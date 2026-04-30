@@ -32,7 +32,8 @@ The orchestrator passes a single message with three sections:
 
 1. **Parse the JSON block**. If it's malformed → return `overall: "needs-revision"` with a single blocking issue `JSON parse error: <message>`.
 2. **Per-case checks** — go through each case and verify:
-   - **Title format** matches the stream's convention from the rule pack (suffix vs prefix vs role+prefix). Including: only one scenario tag, no `(AI generated)` suffix where prefix style applies, under 80 chars after tags, no filler words.
+   - **Title format** matches the stream's convention from the rule pack (suffix vs prefix vs role+prefix). Including: only one scenario tag, no `(AI generated)` suffix where prefix style applies, under 80 chars after tags, no filler words. For prefix-style streams: descriptive part follows `Verify <natural sentence>` style. Em-dash followed by a comma-list of multiple actions (e.g. `Welcome popup — display, show-once across refresh and new tab`) → blocking; suggested fix: rewrite as `Verify <subject> <verb> <object/condition>`.
+   - **Terminology grounding** — flag any segment value, feature flag name, CTA label, page name, or property key that does not appear in the requirements report or `cross_platform_cases`. Specifically reject invented descriptors: `newly X` / `existing X` / `non-X` / `marked as X on backend` when the source uses different exact strings (e.g. requirements says `Power User segment` → `newly elite` is blocking). suggested_fix: replace with the exact source string.
    - **HTML validity**:
      - No double-wrapped `<p><p>...</p></p>`
      - No `<a href="<a href=...">` (nested anchors)
@@ -53,6 +54,7 @@ The orchestrator passes a single message with three sections:
      - Last step states the main expected result
      - Negative test cases include the 4-check verification (validation error / value not saved / previous value unchanged / no side effects)
      - No platform-specific data inlined in steps
+     - **Product-flow language** — backend-internals steps (`Backend call /xyz is fired`, `Backend marks user as Z`, `Server flag toggles`) are blocking unless the case is explicitly backend-scoped (API / server-side validation). suggested_fix: rephrase as user action with visible outcome.
    - **No banned content**: no hex codes, font names, icon asset names, pixel sizes
    - **E2E completeness**: each case starts from an entry point and ends with a verifiable final state
    - **Custom fields**:

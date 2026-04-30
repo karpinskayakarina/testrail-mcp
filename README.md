@@ -96,7 +96,8 @@ custom_steps_separated: [
 | `custom_automation_status` | 1=None, 2=Automated, 3=To be automated, 4=Won't automate, 5=Needs update, 6=To investigate, 7=Automated in another case, 8=Deleted |
 | `custom_completion_status` | 1=In progress, 2=Ready for review, 3=On review, 4=Done, 5=Needs to update |
 | `custom_case_platform_dropdown` | 4=Both_views (other values TODO) |
-| `custom_regression`, `custom_smoke`, `custom_isabtest` | true / false |
+| `custom_regression`, `custom_isabtest` | true / false |
+| `custom_additional_info` | Free-form text (HTML allowed) — case-level, not per-step |
 
 **Nebula X only** — `custom_case_role` (multi-select): 1=Admin, 2=Manager, 3=Expert, 4=Moderator, 5=ASM, 6=QC.
 

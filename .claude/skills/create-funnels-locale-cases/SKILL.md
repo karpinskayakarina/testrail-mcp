@@ -222,7 +222,6 @@ template_id: 2
 type_id: 6
 custom_completion_status: 2
 custom_case_platform_dropdown: 4
-custom_smoke: false
 custom_regression: true
 custom_isabtest: false
 custom_automation_status: 3

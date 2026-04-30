@@ -207,7 +207,6 @@ template_id: 2
 type_id: 6
 priority_id: 4
 custom_regression: true
-custom_smoke: false
 custom_isabtest: false
 custom_automation_status: 3       # default; cases 11 and 12 → 4 (Won't automate)
 custom_completion_status: 2
@@ -238,7 +237,6 @@ Build a JSON array of 11 (no scan) or 12 cases:
     "priority_id": 4,
     "estimate": "10min",
     "custom_regression": true,
-    "custom_smoke": false,
     "custom_isabtest": false,
     "custom_automation_status": 3,
     "custom_completion_status": 2,

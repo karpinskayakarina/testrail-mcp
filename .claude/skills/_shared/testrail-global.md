@@ -54,7 +54,39 @@ Applies to every stream using the `[AI Generated][...]` prefix:
 - Scenario tag (`[Happy Path]`, `[Negative]`, `[Edge Case]`) MUST be the second tag
 - Do NOT add `(AI generated)` at the end of the title — strip it if it appears after upload
 - Title under 80 characters after the tags
-- Use `—` to separate action from result (e.g. `Admin updates threshold — Expert Dashboard reflects change`)
+- **Use `Verify <natural sentence>` style** for the descriptive part after the tags. Single action + result, in plain English. Em-dash is OK to separate one action from one result, but NOT followed by a comma-list of multiple actions.
+  - OK: `[AI Generated][Happy Path] Verify Power User can claim 300 credits via "Claim my gift" CTA`
+  - OK: `[AI Generated][Happy Path] Admin updates threshold — Expert Dashboard reflects change`
+  - DON'T: `[AI Generated][Happy Path] Welcome popup for newly elite — display, show-once across refresh and new tab` (em-dash + comma-tail, multiple actions)
+- Preserve neighbor titles' style — check 1-2 cases already in the target section before generating; if they use `Verify ...`, follow.
+
+---
+
+## Source-of-truth terminology — no inventing
+
+Before writing preconds, steps, or titles, extract the exact product terminology from these sources, in priority order:
+1. The Jira ticket description / Acceptance Criteria
+2. Linked configs — GrowthBook flag names, segment values, property keys
+3. Cross-platform reference cases (`cross_platform_cases` block when present)
+4. Figma frame text — CTA labels, page names, modal titles
+
+These extracted strings are **ground truth**. Do NOT invent descriptive variants from the feature name.
+
+### Forbidden invented patterns
+- `newly X`, `existing X`, `non-X` and similar derivations — unless that exact string appears in a source
+- Backend-internals descriptions of user state (`marked as X on backend`, `flagged in DB`) — describe the user-visible product state instead
+- CTA labels improvised from the feature name — copy them verbatim from Figma or sister-platform cases
+
+### When sources contradict
+- Jira AC contradicts a config (e.g. AC says `trigger on segment X`, config still references the deprecated `trigger on N credits`) → **trust Jira AC**. Flag the case with `_warning: "config drift — AC says X, config says Y"`.
+
+### Example — RETENTION-1490 / CS Promo
+| Don't | Do |
+|---|---|
+| `User is in the newly elite segment` | `User has Power User segment (ltvwtvSegment = power)` |
+| `User is marked as elite on backend` | `User has Power User segment` |
+| `Click "mailto link on welcome popup"` | `Click "Claim my gift" CTA on welcome popup` |
+| Trigger: `User crossed 15000 credits` | Trigger: `User has Power User segment` (config threshold of 15000 is deprecated per AC) |
 
 ---
 
@@ -64,6 +96,7 @@ Applies to every stream using the `[AI Generated][...]` prefix:
 - Each step = action → expected result
 - Each `expected` field MUST be non-empty
 - Steps must be REUSABLE — write generic enough to apply across funnels/features of the same type
+- **Use product-flow language**, not backend-internals. Frame steps as user actions with visible outcomes (`Click "Claim my gift" CTA → 300 credits are added to balance`), not server-side mechanics (`Backend call /credits/add is fired`, `Backend marks user as elite`). Exception: cases explicitly scoped to backend / API.
 - FORBIDDEN: repeating any data already present in preconditions inline in steps
 - FORBIDDEN: adding "Automation Notes" steps
 - FORBIDDEN: null/empty steps
@@ -99,10 +132,10 @@ Do **NOT** ask the user any custom-field questions. Fill these values automatica
 | 3 | `estimate` | **per case content** | 3–5 steps no mock → `3m`; 5–8 → `5m`; 8–12 + mock/env → `10m`; multi-role/external tool → `15m`; full regression → `20m` |
 | 4 | `custom_automation_status` | **1 — None** | Always |
 | 5 | `custom_completion_status` | **1 — In progress** | Always |
-| 6 | `custom_smoke` | **false** | Always |
-| 7 | `custom_regression` | **false** | Always |
-| 8 | `custom_isabtest` | **false** | Always |
-| 9 | `custom_case_platform_dropdown` | **None — omit field from payload** | Numeric value for None is TODO; safest is to NOT include the key in the JSON sent to `add_case` / `update_case` |
+| 6 | `custom_regression` | **false** | Always |
+| 7 | `custom_isabtest` | **false** | Always |
+| 8 | `custom_case_platform_dropdown` | **None — omit field from payload** | Numeric value for None is TODO; safest is to NOT include the key in the JSON sent to `add_case` / `update_case` |
+| 9 | `custom_additional_info` | **Figma + Growthbook links from the source ticket, if present** | If the Jira ticket carries a Figma link or a Growthbook link, put both into this field as HTML anchors (one per line). If neither is present in the ticket, omit the field. Case-level — distinct from per-step `additional_info` inside `custom_steps_separated`. |
 
 If the user explicitly overrides any of these in the conversation (e.g. "this is a smoke case"), apply the override only for the cases mentioned and only for the current run. Do not change the defaults file from chat.
 
