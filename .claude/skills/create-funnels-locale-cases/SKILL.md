@@ -15,6 +15,8 @@ description: Generates 2 standard locale-specific funnel cases (Case 1 — succe
 
 ### Step 1 — Collect required inputs (parse args first, ask only what's missing — ONE question at a time)
 
+> **Codebase awareness — repo-agnostic.** This skill MAY be invoked from the web app repo (where `src/funnels/...` lives) or from the testrail-mcp repo (where it does NOT). Probe once: `[ -d src/funnels ] && echo has-funnels-code` — store the result as `code_lookup_available`. If false, every `grep src/funnels/...` lookup in Step 4 is skipped and the data comes from Q&A or from the funnel's existing EU base case in TestRail. Do not invent code paths that aren't there.
+
 Inputs may be passed **inline** with the command in any order, e.g.:
 - `/create-funnels-locale-cases aura PT EU`
 - `/create-funnels-locale-cases 78182 PT EU` (when the Locales section ID is known)
@@ -54,11 +56,11 @@ If not found → ask the user for the localized "Get secret discount" button tex
 
 ### Step 4 — Collect funnel-specific test data
 
-Look up in code first — ask the user only what's missing:
+If `code_lookup_available == true` (Step 1), grep the listed files first; otherwise jump straight to TestRail / user. Ask only for what's still missing.
 
 - **Date of birth + zodiac** — copy from the funnel's existing EU base case (Case 1, "Check successful payments for user with EU locale and email check").
 - **Split screen values** (archetype, goal, mainGoal, palmReadingGoal, lineage, whichFigure, peopleStrongAuraFamily, etc.) — copy keys + EN values from the funnel's EU base case, then translate using the locale reference style from Step 3.
-- **Email subject + button** — check `src/funnels/constants/email.ts` first; otherwise copy from the funnel's existing EU base case. Email subjects/buttons stay in English.
+- **Email subject + button** — if `code_lookup_available`, check `src/funnels/constants/email.ts` first. Otherwise (or if not found in code), copy from the funnel's existing EU base case in TestRail. Email subjects/buttons stay in English.
 - **Scan source** — always `CAMERA` for locale cases (no scan-failure case in this set).
 
 ### Step 5 — Build URLs
@@ -90,9 +92,36 @@ Ask: "Should I create a Jira task for these locale cases, or do you have an exis
 1. Ask: "What is the Jira task key to link? (e.g. AUTOMATION-1234)"
 2. Set `refs = that key` on both locale cases before calling `add_case`.
 
-### Step 7 — Build and create both cases
+### Step 7 — Build, review, and create both cases
 
-Validate HTML before each `add_case` (see Content Validation below).
+#### 7a — Build the JSON for both cases
+
+Compose the two case payloads in memory using the templates below. Apply the case-fields defaults from the "Case Fields" section. Do not call `add_case` yet.
+
+#### 7b — Independent QA pass via test-case-reviewer
+
+Before any TestRail write, send the 2 cases to the reviewer agent for an independent check (HTML validity, completeness, preconditions structure, locale token correctness). This mirrors the QA pass that `create-funnel-cases-appnebula` runs.
+
+```
+rule_pack = read(.claude/skills/_shared/testrail-global.md)
+          + read(.claude/skills/_shared/streams/funnels-appnebula.md)
+
+Agent({
+  subagent_type: "test-case-reviewer",
+  prompt: "## draft_cases\n{JSON of the 2 cases built in 7a}\n\n---\n\n## rule_pack\n{rule_pack}\n\n---\n\n## requirements\nFunnel: {funnel_name} (slug: {funnel_slug})\nGeneration mode: locale 2-set\n\nlocale_metadata:\n  locale: {LOCALE}\n  region: {EU|LATAM}\n  funnel_slug: {slug}\n  parent_section_id: {locales_section_id}\n  has_email_marketing: {true|false}\n\nExpected case count: 2 (Case 1 — payments + emails; Case 2 — additional discount flow). Both must end with '(AI generated)' suffix per AppNebula funnels convention.\n\nNo Jira ticket — funnel-driven generation."
+})
+```
+
+If `verdict.overall == "needs-revision"`:
+- Patch the affected case(s) inline based on `blocking_issues` (re-apply the build template for the failing case, applying the reviewer's `suggested_fix`)
+- Re-invoke the reviewer
+- Loop max 2 times. If still failing, surface the verdict to the user and ask `proceed anyway / cancel`.
+
+#### 7c — Final inline HTML check + add_case
+
+After the reviewer passes, run the inline content validation below as a defensive last-line check, then call `mcp__claude_ai_Testrail_MCP_2__add_case` for each case (or `update_case` if updating an existing one).
+
+---
 
 **Case 1 — Check successful payments and emails for {LOCALE} locale**
 
