@@ -1,13 +1,13 @@
 ---
 name: create-funnel-cases-appnebula
-description: Generates the standard 12-case test set for an AppNebula funnel (TestRail project 6, suite 486, parent_id 8648). Trigger when the user asks for funnel test cases by funnel slug or display name (aura, palmistry, birth-chart-calculator, numerology, dream-interpretation, …) or says things like "create cases for {funnel} funnel", "стандартний набір для {funnel}", "нова воронка {slug}", "AppNebula funnel cases". Does NOT trigger on a Jira ticket key (CETS-/CHAT-/ALPHA-…) — those go to testrail-jira-figma-generator. Supports flags --draft (generate only), --update (fetch existing + diff + update), --update --dry-run (diff only).
+description: Generates the standard 12-case test set for an AppNebula funnel (TestRail project 6, suite 486, parent_id 8648). Trigger when the user asks for funnel test cases by funnel slug or display name (aura, palmistry, birth-chart-calculator, numerology, dream-interpretation, …) or says things like "create cases for {funnel} funnel", "стандартний набір для {funnel}", "нова воронка {slug}", "AppNebula funnel cases". Does NOT trigger on a Jira ticket key (CETS-/CHAT-/ALPHA-…) — those go to testrail-jira-figma-orchestrator. Supports flags --draft (generate only), --update (fetch existing + diff + update), --update --dry-run (diff only).
 ---
 
 # Create AppNebula Funnel Cases — standard 12-set
 
 Funnel-specific orchestrator. Generates the standard 12-case set for a single AppNebula funnel under TestRail parent_id 8648. Generation is **template-based, no author agent** — funnel cases are 95% deterministic templates with per-funnel variable substitution. The reviewer agent still runs for an independent QA pass.
 
-## When to use this vs `testrail-jira-figma-generator`
+## When to use this vs `testrail-jira-figma-orchestrator`
 
 | Use this skill | Use the orchestrator |
 |---|---|
@@ -144,7 +144,7 @@ If the user passed `--jira CETS-XXXX` OR the funnel section description has a li
 ```
 Agent({
   subagent_type: "requirements-collector",
-  prompt: "Extract requirements from {TICKET-KEY} (cloudId: 676994ec-3063-4a4c-87a0-a41e1b04d5c6)"
+  prompt: "Extract requirements from {TICKET-KEY}"
 })
 ```
 
@@ -258,7 +258,7 @@ Send the JSON array to the reviewer for an independent QA pass. The reviewer nee
 ```
 Agent({
   subagent_type: "test-case-reviewer",
-  prompt: "## draft_cases\n{JSON}\n\n---\n\n## rule_pack\n{concatenation of testrail-global.md + funnels-appnebula.md}\n\n---\n\n## requirements\nFunnel: {display_name} (slug: {slug})\nGeneration mode: standard 12-case set\n\nfunnel_metadata:\n  scan: {true|false}\n  scan_type: {hand|face|null}\n  email_marketing: {true|false}\n  upsell: {ULTRA_PACK|CONSULTATION|null}\n  prices: {dump funnel_metadata.prices}\n  email: { subject, button }\n\nExpected case count: {12 if scan else 11}. Case 6 MUST be omitted when scan == false.\n\n{Jira ticket excerpt from Step 1, or 'No Jira ticket — funnel-driven generation'}"
+  prompt: "## draft_cases\n{JSON}\n\n---\n\n## rule_pack\n{concatenation of testrail-global.md + jira-integration.md + funnels-appnebula.md}\n\n---\n\n## requirements\nFunnel: {display_name} (slug: {slug})\nGeneration mode: standard 12-case set\n\nfunnel_metadata:\n  scan: {true|false}\n  scan_type: {hand|face|null}\n  email_marketing: {true|false}\n  upsell: {ULTRA_PACK|CONSULTATION|null}\n  prices: {dump funnel_metadata.prices}\n  email: { subject, button }\n\nExpected case count: {12 if scan else 11}. Case 6 MUST be omitted when scan == false.\n\n{Jira ticket excerpt from Step 1, or 'No Jira ticket — funnel-driven generation'}"
 })
 ```
 

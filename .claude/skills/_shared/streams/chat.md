@@ -64,7 +64,7 @@ If yes — use the per-platform Chat stream story:
 | Android | Mobile: Android (137), group_id 13735 | `AUTOMATION-500` |
 | Web | AskNebula (170), group_id 7653 | `AUTOMATION-998` |
 
-Use the global non-Funnels Jira description and summary format — see `_shared/testrail-global.md`.
+Use the global non-Funnels Jira description and summary format — see `_shared/jira-integration.md`.
 
 ---
 

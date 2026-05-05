@@ -89,7 +89,7 @@ Multi-select field indicating which role(s) the case is already automated for. *
 
 ## Test Case Defaults (CETS / NebulaX flow)
 
-When generating cases via the Jira→Figma generator (`testrail-jira-figma-generator`), apply these fixed fields:
+When generating cases via the Jira→Figma generator (`testrail-jira-figma-orchestrator`), apply these fixed fields:
 
 ```
 custom_regression: true

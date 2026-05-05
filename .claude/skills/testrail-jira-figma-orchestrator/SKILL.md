@@ -1,5 +1,5 @@
 ---
-name: testrail-jira-figma-generator
+name: testrail-jira-figma-orchestrator
 description: Orchestrates a 4-agent pipeline (requirements-collector → figma-analyzer → test-case-author → test-case-reviewer) to generate, review, and upload TestRail test cases from a Jira ticket. Trigger when the user passes a Jira ticket key (e.g. CETS-123, CHAT-456) with or without flags, or asks to "generate / regenerate / update test cases" for a ticket. Supports flags --draft (generate only), --update <ids> (fetch + diff + update), --update --dry-run (diff only).
 ---
 
@@ -86,8 +86,9 @@ Call `mcp__claude_ai_Testrail_MCP_2__get_case` for each ID. If any ID is missing
 
 Read and concatenate (in this order):
 1. `.claude/skills/_shared/testrail-global.md` — always
-2. `.claude/skills/_shared/streams/<stream>.md` — the detected stream (`content` | `chat` | `retention` | `funnels-appnebula` | `funnels-quiz` | `nebulax`)
-3. `.claude/skills/_shared/platforms/<platform>.md` — only when `platform != "none"`
+2. `.claude/skills/_shared/jira-integration.md` — always (TestRail-paired Jira task conventions)
+3. `.claude/skills/_shared/streams/<stream>.md` — the detected stream (`content` | `chat` | `retention` | `funnels-appnebula` | `funnels-quiz` | `nebulax`)
+4. `.claude/skills/_shared/platforms/<platform>.md` — only when `platform != "none"`
 
 Concatenate the file contents (with file path headers) into the `rule_pack` string. This is what the author and reviewer agents will receive.
 
@@ -129,7 +130,7 @@ The collected list is passed to the author in Step 4 as the `## cross_platform_c
 ```
 Agent({
   subagent_type: "requirements-collector",
-  prompt: "Extract requirements from {TICKET-KEY} (cloudId: 676994ec-3063-4a4c-87a0-a41e1b04d5c6)"
+  prompt: "Extract requirements from {TICKET-KEY}"
 })
 ```
 
@@ -137,15 +138,29 @@ Capture the markdown report. Extract the Figma URLs section into a list. Surface
 
 ## STEP 3 — call figma-analyzer
 
-If the report has zero Figma URLs:
+### 3a — when the requirements report has zero Figma URLs
+
+Design context is critical. Common reasons URLs are missing: old design left in Confluence and never linked, frames too large to share, designer forgot to attach. Don't proceed silently — if the user did NOT already attach a screenshot to the original orchestrator message, pause and ask:
+
 ```
-Agent({
-  subagent_type: "figma-analyzer",
-  prompt: "no Figma URLs"
-})
+The Jira ticket has no Figma URLs and no screenshot is attached.
+Design context is needed for accurate test generation.
+
+- Paste a Figma screenshot now (drag-drop / paste an image), then reply `done`
+- Or paste one or more Figma URLs (comma-separated)
+- Or reply `skip` to proceed without design context
 ```
 
-Otherwise pass the URLs with their source labels:
+Wait for the response.
+- **Screenshot attached** → call figma-analyzer with the image attached and prompt `Analyze the attached screenshot. No Figma URLs available.`
+- **URLs pasted** → continue with 3b.
+- **`skip`** → call figma-analyzer with prompt `no Figma URLs`. The author will receive a "no design context" report and must rely on AC alone.
+- **Invalid input** → reprint the prompt once; if still invalid, treat as `skip`.
+
+If the user already attached a screenshot to the original orchestrator message, skip the prompt and pass the screenshot to figma-analyzer directly.
+
+### 3b — when URLs are present
+
 ```
 Agent({
   subagent_type: "figma-analyzer",
@@ -164,7 +179,49 @@ Agent({
 })
 ```
 
-Extract the JSON from the fenced ```json block in the response.
+Extract the JSON from the fenced ```json block in the response. The author returns ONE of two shapes:
+
+| Shape | Meaning | Next |
+|---|---|---|
+| Array `[case, case, …]` | Author generated cases | STEP 5 |
+| Object `{"_clarifications_needed": [...]}` | Author found hard contradictions and stopped | STEP 4.5 |
+
+## STEP 4.5 — clarifications pause (only when author returns `_clarifications_needed`)
+
+Surface the questions to the user verbatim. Do NOT paraphrase — the author's wording references specific input lines.
+
+```
+The author found hard contradictions in the inputs and needs clarification before generating tests:
+
+1. {question 1}
+2. {question 2}
+
+Reply with answers in the same numbered order, or `force_generate` to skip and let the author generate with placeholders + per-case warnings, or `cancel` to abort.
+```
+
+Wait for the response.
+
+- **Numbered answers** → append to the requirements report under a new section:
+  ```
+  ## Author clarifications
+  Q1: {question 1}
+  A1: {user answer 1}
+  Q2: {question 2}
+  A2: {user answer 2}
+  ```
+  Re-invoke the author (Step 4) with the updated requirements report — same prompt, same other inputs.
+- **`force_generate`** → append to the requirements report:
+  ```
+  ## Author clarifications
+  force_generate: true (user opted to skip clarifications — generate with placeholders and per-case _warning)
+  ```
+  Re-invoke the author (Step 4).
+- **`cancel`** → stop the orchestrator, no upload.
+- **Unparseable input** → reprint the prompt once; if still unclear, treat as `cancel`.
+
+If the author returns `_clarifications_needed` AGAIN with the SAME or substantively-overlapping questions on re-invocation → surface to user as blocker (`Author re-asked the same question after clarification — manual review needed`) and stop. Do not loop.
+
+After receiving the cases array on re-invocation, continue to STEP 5.
 
 ## STEP 5 — call test-case-reviewer
 
@@ -229,13 +286,141 @@ Repeat 6a–6d up to 2 times total. If still `needs-revision` after 2 retries �
 
 ## PAUSE — show + approve
 
-Show the user:
-- Standard flow: numbered list of titles + reviewer summary
-- Update flow: per-case diff table (title / priority / automation / preconditions / step-by-step) with ✏️ markers for changes, ➕ for new steps, 🗑️ for removed steps
+The user inspects the generated set BEFORE upload. Show a structured high-level view, not a wall of titles, so over-fragmentation / wrong-scope / missing-coverage become obvious.
 
-Wait for `approve` / `edit ...` / `cancel`.
+### Display — standard flow
 
-If `--draft` or `--dry-run` → stop here permanently regardless of user response.
+```
+# {N} cases for {TICKET-KEY}
+
+## Coverage summary
+- Entities covered: {entity-A: scenarios, entity-B: scenarios, ...}     # derived from titles + preconds
+- Scenario mix: {N_happy} happy / {N_negative} negative / {N_edge} edge case
+- Granularity: {OK | over-fragmented | thin}                            # heuristic — see below
+
+## Cases
+1. {title}                                              # priority_id, estimate
+2. {title}
+…
+
+## Reviewer verdict
+{verdict.summary}
+{any non-blocking suggestions, one line each}
+```
+
+**Granularity heuristic** — flag `over-fragmented` when:
+- ≥3 cases share an identical preconds block AND form a sequential happy path (each case's after-state = next case's pre-state) → suggest merging into 1 E2E
+- ≥2 cases differ ONLY in one entity attribute (segment value, role, locale) without distinct logic → suggest a single parameterised case
+
+Flag `thin` when the case count is materially below the AC item count (≥2 AC items uncovered per Step 5 review).
+
+### Display — update flow
+
+Per-case diff table (title / priority / automation / preconditions / step-by-step) with ✏️ markers for changes, ➕ for new steps, 🗑️ for removed steps. Coverage summary section is still shown above the diff.
+
+### User options
+
+```
+approve              — proceed to STEP 7 (upload)
+edit <command>       — user-driven revision (see syntax below); routes through STEP 6.6
+details <N>          — show full preconds + steps for case N (no state change)
+cancel               — stop, no upload
+```
+
+If `--draft` or `--dry-run` → only `details <N>` and `cancel` are accepted. Approve/edit are no-ops.
+
+### `edit` command syntax
+
+| Command | Effect |
+|---|---|
+| `edit merge <i>,<j>[,<k>...]` | Merge listed cases into one E2E. Author must preserve all assertions from each, dedup steps, keep one preconds block. |
+| `edit split <i>: <hint>` | Split case i into ≥2 cases per hint. Hint describes the dimension (e.g. "split by role: Admin and Expert"). |
+| `edit drop <i>` | Remove case i from the set. No re-author needed for this one — orchestrator removes it directly. |
+| `edit add: <description>` | Add a new case covering `<description>`. Author generates from scratch using the same rule pack + cross-platform refs. |
+| `edit case <i>: <hint>` | Rewrite case i per hint. Hint can address title / preconds / steps / scope (e.g. "remove backend-internals language", "tighten preconds to PU segment only"). |
+
+Multiple commands may be issued in one reply, one per line. Examples:
+```
+edit merge 3,4
+edit case 7: tighten preconds to PU segment only
+edit add: Verify FAB Live Chat is hidden outside working hours
+```
+
+## STEP 6.6 — user-driven revision (only when PAUSE returned `edit`)
+
+Mirrors STEP 6 (reviewer-driven retry) but the `fix_targets` come from the user, not the reviewer.
+
+### 6.6a — parse edit commands
+
+Build `fix_targets` and `new_cases_needed` from the user's edit lines:
+
+```
+fix_targets = []
+new_cases_needed = []
+drops = []                                   # indexes to remove directly
+
+for line in edit_lines:
+  parse command
+  case "merge i,j[,...]":
+    fix_targets.append({
+      case_index: i,                         # primary slot keeps the merged result
+      blocking_issues: ["user requested merge with cases " + j[,...]],
+      suggested_fix: "merge cases " + i,j[,...] + " into one E2E. Preserve assertions, dedup steps."
+    })
+    drops.extend(j[,...])                    # secondary slots get removed after merge
+  case "split i: <hint>":
+    fix_targets.append({
+      case_index: i,
+      blocking_issues: ["user requested split"],
+      suggested_fix: "split per hint: " + hint
+    })
+    # author may return multiple cases for one fix_target — see 6.6c
+  case "drop i":
+    drops.append(i)
+  case "add: <description>":
+    new_cases_needed.append(description)
+  case "case i: <hint>":
+    fix_targets.append({
+      case_index: i,
+      blocking_issues: ["user-driven revision"],
+      suggested_fix: hint
+    })
+```
+
+If parsing fails on any line → surface the unparseable line to the user, ask for correction, do not proceed.
+
+### 6.6b — invoke author in retry mode
+
+Same prompt shape as Step 6b. The author receives `fix_targets`, `existing_draft`, and `new_cases_needed`. Author must distinguish `merge` and `split` commands by reading `suggested_fix`:
+- `merge` → return ONE replacement case for the primary `case_index`.
+- `split` → return MULTIPLE cases. The first one keeps `_fix_target_index = i` (replaces the original); the rest carry `_status: "new"` and append to the draft.
+
+### 6.6c — merge result + apply drops
+
+```
+merged = copy(existing_draft)
+for case in author_output:
+  if case._fix_target_index is not null:
+    merged[case._fix_target_index] = case
+  else:
+    merged.append(case)
+
+# remove dropped indexes — process in descending order so earlier indexes stay valid
+for idx in sorted(drops, reverse=True):
+  del merged[idx]
+```
+
+### 6.6d — re-invoke reviewer
+
+Same as Step 5/6d. Reviewer sees the full revised set.
+
+### 6.6e — return to PAUSE
+
+Show the new coverage summary + cases + reviewer verdict. User can issue more `edit` commands, `approve`, or `cancel`.
+
+### 6.6f — loop guard
+
+Max **3 total user-driven revision rounds**. After the 3rd, only `approve` / `cancel` are accepted; further `edit` is rejected with `Edit limit reached — approve current state or cancel and re-run from scratch`. This prevents indefinite refinement loops.
 
 ## STEP 7 — upload to TestRail
 

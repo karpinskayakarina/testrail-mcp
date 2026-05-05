@@ -149,12 +149,12 @@ Two user-facing skills cover the two distinct flows:
 
 | Skill | When to use | Entry point |
 |-------|-------------|-------------|
-| `testrail-jira-figma-generator` | **Jira-driven flow** — a Jira ticket exists, AC drives generation, Figma usually present. Covers Content / Chat / Retention / NebulaX / Quiz funnels and feature-specific work inside AppNebula funnels. | `/testrail-jira-figma-generator <TICKET-KEY>` |
+| `testrail-jira-figma-orchestrator` | **Jira-driven flow** — a Jira ticket exists, AC drives generation, Figma usually present. Covers Content / Chat / Retention / NebulaX / Quiz funnels and feature-specific work inside AppNebula funnels. | `/testrail-jira-figma-orchestrator <TICKET-KEY>` |
 | `create-funnel-cases-appnebula` | **AppNebula funnel standard 12-set** — funnel slug is the entry point, no Jira required, code lookup for prices/email/userData, auto-Jira creation for new sections. | `/create-funnel-cases-appnebula <funnel-slug>` |
 
 Both skills support `--draft` (generate only), `--update` (regenerate + diff + update), and `--update --dry-run` (diff only).
 
-The orchestrator pipeline (`testrail-jira-figma-generator`) delegates each step to a sub-agent. The funnel skill (`create-funnel-cases-appnebula`) does template-based substitution **inline** — no author agent — and only delegates the QA pass to the reviewer agent.
+The orchestrator pipeline (`testrail-jira-figma-orchestrator`) delegates each step to a sub-agent. The funnel skill (`create-funnel-cases-appnebula`) does template-based substitution **inline** — no author agent — and only delegates the QA pass to the reviewer agent.
 
 Full definitions: `.claude/skills/{skill-name}/SKILL.md`.
 
@@ -179,11 +179,12 @@ Reference packs live in `.claude/skills/_shared/` and are organized in four laye
 
 | Layer | Path | Content |
 |---|---|---|
-| Global | `testrail-global.md` | TestRail field IDs, priority/type/automation mappings, AI-generated marker conventions, prefix-style rules, HTML validation, Jira task standards |
+| Global | `testrail-global.md` | TestRail field IDs, priority/type/automation mappings, AI-generated marker conventions, prefix-style rules, HTML validation, source-of-truth terminology gate |
+| Jira | `jira-integration.md` | TestRail-paired Jira task conventions — `components: Automation`, summary/description templates with `C{case_id}`, stream-specific linking |
 | Stream | `streams/{content,chat,retention,funnels-appnebula,funnels-quiz,nebulax}.md` | Per-stream entity model, test patterns, Jira story mappings, stream-specific deltas. Includes Nebula X (role-prefixed cases under TestRail project 10). |
 | Platform | `platforms/{ios,android,web}.md` | Behavioral deltas only — gestures, permissions, browser matrix, cookie consent |
 
-These files are **read on demand** by the orchestrator (`testrail-jira-figma-generator`) — not auto-loaded into every conversation context. The orchestrator concatenates the relevant pack and passes it to the author and reviewer agents as the `rule_pack` input. This keeps the active context lean while preserving a single source of truth.
+These files are **read on demand** by the orchestrator (`testrail-jira-figma-orchestrator`) — not auto-loaded into every conversation context. The orchestrator concatenates the relevant pack and passes it to the author and reviewer agents as the `rule_pack` input. This keeps the active context lean while preserving a single source of truth.
 
 ## Local Development
 

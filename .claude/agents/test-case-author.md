@@ -81,7 +81,11 @@ existing_cases: {optional — array of existing case JSON objects when --update 
 ]
 ```
 
-When `fix_targets` is present this is a **retry invocation**. See "Incremental retry mode" below.
+When `fix_targets` is present this is a **retry invocation**. See "Incremental retry mode" below. `fix_targets` entries can come from two sources — the orchestrator does NOT distinguish, you handle them the same way:
+- **Reviewer-driven** — `blocking_issues` lists rule violations the reviewer found, `suggested_fix` is the reviewer's concrete fix.
+- **User-driven** (post-PAUSE edit) — `blocking_issues` carries text like `"user requested merge with cases X,Y"` or `"user-driven revision"`, `suggested_fix` is the user's hint (e.g. `"merge cases 3,4 into one E2E"`, `"split per hint: by role"`, `"tighten preconds to PU segment only"`).
+
+For `merge` commands → return ONE replacement case at the primary `case_index`. For `split` commands → return MULTIPLE cases: the first keeps `_fix_target_index = i` (replaces the original), the rest carry `_status: "new"` and no `_fix_target_index`.
 
 When `cross_platform_cases` is present, the orchestrator has discovered existing cases on another platform (iOS / Android / Web) for the SAME feature. The stream rule pack (Content / Chat / Retention) explicitly states that core test logic — steps and expected results — should be IDENTICAL across platforms; only preconditions adapt. See "Cross-platform consistency" below.
 
@@ -155,9 +159,36 @@ When the input contains `## fix_targets` AND `## existing_draft` you are in retr
 5. **Same field rules apply** — title format, custom fields, HTML validation. The reviewer will check the merged result.
 6. **Do NOT touch unrelated cases** even if you'd write them differently. Stay surgical.
 
+## Clarifications mode (hard contradictions only)
+
+Before generating, scan all inputs (requirements + design + rule pack + cross-platform cases) for **HARD contradictions** that would make any test case wrong, not just placeholder-y. Examples:
+- AC says one flow, design (Figma) shows a contradicting flow on the same screen (`AC: opens new tab` vs `Figma: shows modal`)
+- A required value (segment name, feature flag, threshold, CTA label) is referenced by AC but **not defined anywhere** — Jira / config / `cross_platform_cases` / Figma are all silent
+- Two AC items directly contradict each other
+- An entity required by the rule pack is unresolvable from inputs
+
+When you find ≥1 such contradiction → **do NOT generate cases**. Return ONLY the clarifications envelope:
+
+````
+```json
+{
+  "_clarifications_needed": [
+    "AC §3 says new tab opens after click, but Figma frame 2 shows a modal in the same flow — which is correct?",
+    "Power User segment value not defined in Jira / config / cross_platform_cases / Figma — what is the exact ltvwtvSegment value?"
+  ]
+}
+```
+````
+
+The orchestrator pauses, asks the user, appends answers under `## Author clarifications` in the requirements report, and re-invokes you. On re-invocation, integrate the answers and generate normally.
+
+**Do NOT use this for soft cases.** Missing one optional value, ambiguous wording that resolves with a placeholder, design hex codes — those stay as per-case `_warning` and you generate. Use `_clarifications_needed` only when generating without the answer would produce wrong tests.
+
+**Do NOT re-ask the same question on re-invocation.** If the user answered, integrate. If they answered "proceed" or replied with the keyword `force_generate` (orchestrator may inject it), generate with placeholders + `_warning` instead of re-asking.
+
 ## Output format
 
-Return EXACTLY one fenced JSON block. No preamble, no narration, no checklist.
+Return EXACTLY one fenced JSON block. No preamble, no narration, no checklist. The block contains EITHER the cases array OR the clarifications envelope (mutually exclusive).
 
 ````
 ```json
@@ -207,5 +238,6 @@ Field rules:
 - **Do NOT invent product terminology.** Segment values, flag names, CTA labels, page names, property keys come from Jira AC, linked configs, `cross_platform_cases`, or Figma — never derived from the feature name. See "Source-of-truth terminology" in the rule pack. If a needed string is missing from all sources → `_warning: "missing terminology: <what>"`.
 - **Use product-flow language in steps.** `Click X → Y is shown` / `Y is added to balance` — not `Backend call is fired` / `Backend marks user as Z`. Exception: cases explicitly scoped to backend or API. See "Steps Format → Core principles".
 - **Title style for prefix-style streams: `Verify <natural sentence>`** after the tags. Single action + result; em-dash only when separating one action from one result, never followed by a comma-list of multiple actions. See "Prefix-style rules" in the rule pack.
+- **Cover analytics events from the requirements report.** Each event listed under `## Analytics events` in `requirements` MUST be verified in EXACTLY ONE case — append `Analytics event "<name>" is fired with properties: <props>` to that case's most-natural-trigger step `expected`. Do NOT duplicate the same event check across cases. Exception: when an event has different property values per scenario (e.g. different `entry_point` / `source`) — cover each variation either as separate cases or as an additional step in one case. See "Analytics events coverage" in the rule pack.
 - **Do NOT call any MCP tools.** You have no tools — you only generate.
 - **Output JSON, nothing else.** The orchestrator pipes your output directly to the reviewer and (later) TestRail.

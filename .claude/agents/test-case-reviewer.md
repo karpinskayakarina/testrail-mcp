@@ -63,6 +63,7 @@ The orchestrator passes a single message with three sections:
      - `template_id`, `type_id`, `priority_id` — within rule pack's allowed values
 3. **Set-level checks**:
    - **Coverage gaps** — go through every AC item in the requirements report. For each AC item, find at least one draft case that exercises it. If none → record an entry in `coverage_gaps`.
+   - **Analytics events coverage** — go through every event listed under `## Analytics events` in the requirements. Each event MUST appear in EXACTLY one case's `expected` (format: `Analytics event "<name>" is fired with properties: ...`). Uncovered event → `coverage_gaps` entry. Same event asserted in 2+ cases without distinct property values → `blocking_issue` (duplicate). Variants with different property values (e.g. different `entry_point`) — each variant must be covered exactly once.
    - **Duplicates** — flag two or more cases covering the same flow as a `suggestion` to merge.
    - **Same-action consolidation** — if multiple cases test the same action type (multiple Happy Paths for one feature, etc.), suggest merge.
    - **Standard set completeness** — when the rule pack defines a fixed set (e.g. funnels 12-case), verify every required case is present.

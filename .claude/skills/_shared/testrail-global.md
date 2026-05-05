@@ -2,7 +2,8 @@
 
 > **Scope:** ALL projects, suites, and streams. Single source of truth for formatting, custom fields, and standards. Stream/platform files contain DELTAS only.
 
-This file contains rules that apply everywhere. For domain-specific rules see:
+This file contains TestRail-specific rules that apply everywhere. For domain-specific rules see:
+- Jira automation: `_shared/jira-integration.md` — TestRail-paired Jira task rules (loaded by the orchestrator alongside this file)
 - Streams: `_shared/streams/{content,chat,retention,funnels-appnebula,funnels-quiz,nebulax}.md`
 - Platforms: `_shared/platforms/{ios,android,web}.md`
 
@@ -87,6 +88,30 @@ These extracted strings are **ground truth**. Do NOT invent descriptive variants
 | `User is marked as elite on backend` | `User has Power User segment` |
 | `Click "mailto link on welcome popup"` | `Click "Claim my gift" CTA on welcome popup` |
 | Trigger: `User crossed 15000 credits` | Trigger: `User has Power User segment` (config threshold of 15000 is deprecated per AC) |
+
+---
+
+## Analytics events coverage
+
+Each event listed under `## Analytics events` in the requirements report MUST be verified in **EXACTLY ONE** test case's `expected`. Don't duplicate event checks across multiple cases — once verified, the event is covered.
+
+### How to add the assertion
+
+Pick the case whose flow most naturally triggers the event. Append the assertion to the final-step `expected` (or to the step where the trigger fires):
+
+```
+Analytics event "<event_name>" is fired with properties: <prop1>: <value>, <prop2>: <value>
+```
+
+If the event has no properties → `Analytics event "<event_name>" is fired`.
+
+### Variant coverage exception
+
+When the same event name has DIFFERENT property values across scenarios — e.g. opening the same screen from `entry_point: home` vs `entry_point: push`, or `source: ad` vs `source: organic` — cover each variation. Two clean ways:
+- **Separate cases per variation** (preferred when the surrounding flow also differs)
+- **Additional step in one case** that exercises the alternate path and asserts the variant property (when only the trigger differs)
+
+The requirements report lists each variant occurrence separately under `## Analytics events`. Author picks per-flow: 1 case per variant OR a single case with multi-step assertions. Reviewer rejects if any listed variant is uncovered.
 
 ---
 
@@ -190,39 +215,3 @@ Before calling `update_case` or `add_case`, validate ALL content — preconditio
 - **Sequential step numbering** — steps numbered 0, 1, 2, … with no gaps or repeats
 
 Fix all violations before calling the API.
-
----
-
-## Jira Integration — global
-
-### Always set on every Jira task (no exceptions)
-| Field | Value |
-|-------|-------|
-| `components` | `Automation` |
-
-Applies to Funnels, AskNebula, Mobile, API, and any future suite.
-
-### Summary sanitization
-Never include `(AI generated)` in any Jira task summary. Strip the suffix from case titles before composing the summary.
-
-### Linking — stream-specific
-- **AppNebula Funnels (suite 486, parent_id 8648)** → automatic Jira task creation, see `_shared/streams/funnels-appnebula.md`
-- **Quiz funnels (parent_id 8694)** → ask user, see `_shared/streams/funnels-quiz.md`
-- **Content / Chat / Retention** (across iOS / Android / AskNebula Web) → ask user; section→Jira story mappings in respective stream files
-- **API / other** → ask user, no preset mapping
-
-### Generic non-Funnels Jira task description
-```
-C{case_id}: [TestRail](https://obrio.testrail.io/index.php?/cases/view/{case_id})
-```
-
-Do NOT use the AppNebula "Automate all test cases / To Be Automated" template anywhere except parent_id 8648.
-
-### Generic non-Funnels Jira task summary
-Format: `Automation / {Suite Name} / C{case_id}: {case title}`
-
-Suite name values: `AskNebula`, `Mobile: iOS`, `Mobile: Android`, `API`
-
-Examples:
-- `Automation / AskNebula / C369456: Verify email channel is enabled in all categories when email consent is granted outside Notification Center`
-- `Automation / Mobile: iOS / C123456: Verify user can log in with valid credentials`
