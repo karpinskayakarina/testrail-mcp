@@ -110,7 +110,7 @@ When `cross_platform_cases` is present, the orchestrator has discovered existing
    - `type_id`, `priority_id`, `custom_*` — apply rule pack defaults verbatim. Non-Funnels: see `testrail-global.md` "Custom Fields — auto-fill defaults" (always: `type_id` 6, `custom_automation_status` 1, `custom_completion_status` 1, `custom_regression`/`smoke`/`isabtest` false; OMIT `custom_case_platform_dropdown` from payload). Pick `priority_id` per scenario type (Happy Path → 3-4, Negative/Edge → 1-2). AppNebula Funnels and NebulaX have product-specific overrides — follow their stream/product files. Quiz Funnels follow the global defaults completely (no Funnels-style overrides — title uses prefix style like Content/Chat/Retention).
    - `estimate` — per rule pack guidance.
    - `custom_case_role` — REQUIRED only when stream is `nebulax`. Comma-separated string of role IDs.
-   - `refs` — pass through if existing case had refs (update flow); otherwise leave empty unless rule pack mandates a Jira key (AppNebula auto-link).
+   - `refs` — pass through if existing case had refs (update flow); otherwise leave empty unless rule pack mandates a Jira key (AppNebula auto-link). **Multi-ticket merged report:** if requirements `## Sources` lists 2+ tickets, set `refs` to a comma-separated list of all source tickets (e.g. `RETENTION-1490,RETENTION-920`) — TestRail renders each as a clickable link.
 5. **For `--update` flow** (when `existing_cases` is provided):
    - Match draft cases against existing cases by title similarity AND by the case template position (for fixed sets like funnels)
    - Preserve `refs`, `custom_automation_status`, and other update-protected fields per the rule pack's "Existing funnel path" guidance

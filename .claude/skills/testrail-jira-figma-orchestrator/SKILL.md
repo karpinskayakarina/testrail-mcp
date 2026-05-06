@@ -20,6 +20,7 @@ This orchestrator stays useful for funnels when the work is **feature-driven** b
 | Input | Behavior |
 |-------|---|
 | `CETS-123` / `CHAT-456` | Full flow — generate, review, pause, upload |
+| `RETENTION-1490 RETENTION-920` | **Multi-ticket** — feature decomposed across N tickets. Orchestrator fetches each, merges requirements (AC, User flow, Figma URLs, analytics events, entity inventory) into one combined report. Routing (project / stream / section) detected from the **first** ticket; if later tickets have conflicting prefixes, orchestrator halts and asks. Separators are flexible — commas, spaces, or both: `A,B`, `A, B`, `A B`, `A,  B,C` all work (parser tokenises and keeps only segments matching `[A-Z]+-\d+`). |
 | `... --draft` | Generate + review, show, do NOT upload |
 | `... --update 12345,12346` | Fetch existing cases, regenerate, diff, update |
 | `... --update --dry-run` | Same as --update but show diff only, no writes |
@@ -35,6 +36,14 @@ Auto-detect the **project** from the ticket prefix — do NOT ask which project.
 |---|---|---|
 | `CETS-*` | NebulaX (10) | suite_id 176, section_id 73027 (AI Generated Tests) |
 | anything else | Nebula (6) | project only — section must be picked (see below) |
+
+### Multi-ticket input
+
+When the user passes multiple ticket keys (any of `RETENTION-1490,RETENTION-920` / `RETENTION-1490, RETENTION-920` / `RETENTION-1490 RETENTION-920`):
+- Parse: tokenise on any combination of whitespace and commas, then keep only tokens matching `^[A-Z]+-\d+$`. Drop everything else (whitespace, empty, malformed). Tokens starting with `--` are flags — pass them to the flag parser, not here.
+- Detect routing (project / stream / section) from the **FIRST** ticket only.
+- Validate that all subsequent tickets share the same prefix family (e.g. all `RETENTION-*`, all `CHAT-*`). If not (e.g. `RETENTION-1490,CHAT-1024`) → halt and ask: `Tickets X and Y belong to different streams. Which stream is the target? Type the stream name or remove the off-stream ticket from the list.` Do not proceed without resolution.
+- All tickets are passed to STEP 2 — see Multi-ticket merge there.
 
 ### CETS path — announce and proceed
 
@@ -127,6 +136,8 @@ The collected list is passed to the author in Step 4 as the `## cross_platform_c
 
 ## STEP 2 — call requirements-collector
 
+### 2a — single ticket (default)
+
 ```
 Agent({
   subagent_type: "requirements-collector",
@@ -134,7 +145,82 @@ Agent({
 })
 ```
 
-Capture the markdown report. Extract the Figma URLs section into a list. Surface any `Gaps / clarifying questions` to the user before proceeding — wait for answers, append them to the report under a `User clarifications` section.
+Capture the markdown report.
+
+### 2b — multi-ticket merge (when user passed comma-separated keys)
+
+For each ticket key in order, invoke the agent independently:
+```
+for key in [TICKET-1, TICKET-2, ...]:
+  Agent({
+    subagent_type: "requirements-collector",
+    prompt: "Extract requirements from " + key
+  })
+  store report as reports[key]
+```
+
+Then merge the per-ticket reports into ONE combined report:
+
+```markdown
+# Requirements — {TICKET-1, TICKET-2, ...} (merged)
+
+## Sources
+- {TICKET-1} — {summary line}
+- {TICKET-2} — {summary line}
+...
+
+## Feature purpose
+[{TICKET-1}] {purpose verbatim}
+[{TICKET-2}] {purpose verbatim}
+...
+
+## User flow
+[{TICKET-1}]
+{flow verbatim}
+[{TICKET-2}]
+{flow verbatim}
+...
+
+## Acceptance criteria
+[{TICKET-1}]
+{AC verbatim, original numbering preserved}
+[{TICKET-2}]
+{AC verbatim, original numbering preserved}
+...
+
+## A/B test rules
+{union — first non-`(none)` value wins; if both have rules, list both prefixed with [TICKET-N]}
+
+## GrowthBook feature
+{first non-`(none)` link; if both have links, list both prefixed with [TICKET-N]}
+
+## Entity inventory
+{union of all entities. Where the same entity appears in 2+ tickets, merge the variant lists (dedup).}
+
+## Figma URLs
+{union, dedup by URL. Annotate each URL with the ticket key it came from: `{url} — [{TICKET-N}] {section}`}
+
+## Analytics events
+{union. If the same event_name appears in multiple tickets — keep all occurrences as variants (do NOT dedup by name alone, dedup only when name AND properties AND trigger match).}
+
+## Gaps / clarifying questions
+{union, prefixed with [TICKET-N] for traceability}
+
+## Notes
+{union}
+```
+
+**Conflict resolution rules:**
+- AC items: **never merge or paraphrase across tickets** — keep verbatim per ticket so the author can trace each item back to its source.
+- Same Figma URL in multiple tickets → list once, label with all source tickets (`{url} — [{TICKET-1}, {TICKET-2}] {section}`).
+- Same analytics event with same properties+trigger across tickets → dedup. Different properties → keep as variants per the rule pack's "Variant coverage exception".
+- Entity variants: union, dedup.
+
+After the merge, the combined report is the input for STEP 3 onwards.
+
+### Both paths
+
+After capturing or merging the report: extract the Figma URLs section into a list. Surface any `Gaps / clarifying questions` to the user before proceeding — wait for answers, append them to the report under a `User clarifications` section.
 
 ## STEP 3 — call figma-analyzer
 
