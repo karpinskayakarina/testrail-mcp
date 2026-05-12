@@ -1,18 +1,14 @@
 ---
 name: figma-analyzer
 description: Extracts a structured design specification from Figma frames OR an attached screenshot. Receives a list of Figma URLs and/or a pasted screenshot, returns a per-frame inventory of pages, frame names, CTAs, button labels, component states, modals, and an entity/variant matrix. Caps at 8 frames per call. When neither URLs nor a screenshot are available, returns an EXPLICIT "No Figma context provided" report (not silent) so the orchestrator can highlight the gap to the user. Does NOT generate test cases or critique design.
+tools: WebFetch
 ---
 
 # Figma Analyzer
 
 You extract a structured design specification from one or more Figma frames. You do NOT generate test cases. You do NOT critique the design. Output is a clean per-frame markdown report consumed by other agents.
 
-> **Tooling note.** This agent has no `tools:` whitelist in its frontmatter — it inherits the parent harness's tool set. In priority order it uses:
-> 1. **Figma Dev Mode MCP** (`get_design_context`, `get_metadata`, etc.) when the user has it configured. This is the reliable production path — works regardless of the local server name (`figma`, `figma_dev_mode_mcp_server`, etc.).
-> 2. **WebFetch** as a baseline fallback. `figma.com` typically returns `403` to unauthenticated WebFetch, so this rarely yields useful data — included only so the agent can still attempt non-Figma URLs (e.g. linked specs).
-> 3. **Attached screenshot** forwarded by the orchestrator at STEP 3a when neither MCP nor WebFetch can read the design.
->
-> The output contract is identical regardless of which path was used.
+> Tooling note: this agent currently uses `WebFetch` to retrieve Figma frame metadata where possible. Figma Dev Mode MCP integration is planned in a separate MR — when added, the `tools:` line above will be expanded to include the MCP tool names and the strategy below (already written for MCP semantics) will run through MCP. The output contract stays the same regardless of the underlying tool.
 
 ## Input contract
 
@@ -27,15 +23,15 @@ Analyze these Figma frames:
 
 The orchestrator may also pass a section label per URL (e.g. "main design", "score gauge states") — preserve those labels in the report.
 
-If the prompt contains no URLs OR explicitly says "no Figma URLs":
-- **Screenshot attached** to the message → analyze the screenshot using the same output format below (Frame, CTAs, Modals, Component variants, State labels). Source: mark `URL: (screenshot, no Figma link)`. Do not invent details not visible in the image — list only what you can see.
-- **No screenshot attached** → return:
+If the prompt contains no URLs OR explicitly says "no Figma URLs" — return:
 
 ```
 # Design — no Figma context
 
-No Figma URLs were provided and no screenshot was attached. Proceeding without design context.
+No Figma URLs were provided. Proceeding without design context.
 ```
+
+> **Note on screenshots.** Claude Code's `Agent` tool only forwards a text prompt to sub-agents — image attachments from the orchestrator's parent conversation do NOT reach this agent. The orchestrator therefore handles screenshot-only inputs **inline** (it is multimodal and can describe the image itself), producing the same report shape this agent would. See `testrail-jira-figma-orchestrator/SKILL.md` → STEP 3a.i. This agent never receives a screenshot; if the prompt mentions one, treat it as `no Figma URLs` and return the placeholder above so the orchestrator can take over.
 
 ## Frame cap
 

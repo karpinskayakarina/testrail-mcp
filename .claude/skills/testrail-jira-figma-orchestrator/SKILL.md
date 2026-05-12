@@ -238,12 +238,26 @@ Design context is needed for accurate test generation.
 ```
 
 Wait for the response.
-- **Screenshot attached** → call figma-analyzer with the image attached and prompt `Analyze the attached screenshot. No Figma URLs available.`
+- **Screenshot attached** → see "Screenshot handling" below. Do NOT call figma-analyzer with the image.
 - **URLs pasted** → continue with 3b.
 - **`skip`** → call figma-analyzer with prompt `no Figma URLs`. The author will receive a "no design context" report and must rely on AC alone.
 - **Invalid input** → reprint the prompt once; if still invalid, treat as `skip`.
 
-If the user already attached a screenshot to the original orchestrator message, skip the prompt and pass the screenshot to figma-analyzer directly.
+If the user already attached a screenshot to the original orchestrator message, skip the prompt and go straight to "Screenshot handling".
+
+### 3a.i — Screenshot handling (inline, not via sub-agent)
+
+> **Why inline.** Claude Code's `Agent` tool accepts only a text prompt — image attachments from the orchestrator's parent conversation do NOT pass through to the sub-agent. The figma-analyzer can analyze URLs (text in, text out) but cannot receive an attached image. The orchestrator IS multimodal — it can see the screenshot itself — so it performs the design analysis inline and produces the same report shape the sub-agent would have.
+
+When the user attached (or just pasted) a screenshot:
+
+1. **Do NOT call the figma-analyzer sub-agent.** Skip the `Agent({...})` invocation for this run.
+2. **Analyze the screenshot directly** using the same output contract the sub-agent would produce. Read `.claude/agents/figma-analyzer.md` → "Output format (markdown)" for the exact shape (per-frame inventory: CTAs, read-only fields, modals, component variants, state labels; entity/variant matrix; coverage notes).
+3. **Apply the same hard rules** from the sub-agent: exact label text, no hex codes / fonts / pixel sizes, no invented variants.
+4. **Mark the source**: each Frame block should carry `URL: (screenshot — inline analysis by orchestrator)` instead of a real URL so the author and reviewer know the source.
+5. **Use the produced report as the `design report`** input to STEP 4 (test-case-author).
+
+When Figma Dev Mode MCP integration lands in a separate MR, this section may be revisited so figma-analyzer can run on a saved screenshot file via file-path + `Read` tool. Until then, inline is the only working path.
 
 ### 3b — when URLs are present
 
