@@ -46,7 +46,7 @@ const customFields = {
   custom_completion_status: coerceInt.optional().describe('Writing status in TestRail UI (2=Ready for review, 4=Done). Use 2 for new AI-generated cases.'),
   custom_regression: coerceBool.optional().describe('Is regression test'),
   custom_case_platform_dropdown: coerceInt.optional().describe('Platform (1=Web, 4=AppNebula)'),
-  custom_smoke: coerceBool.optional().describe('Is smoke test'),
+  custom_additional_info: z.string().optional().describe('Free-form additional info for the case (HTML allowed). Case-level — distinct from per-step additional_info inside custom_steps_separated. If the source ticket has a Figma link or a Growthbook link, put them here.'),
   custom_isabtest: coerceBool.optional().describe('Is A/B test'),
 };
 
