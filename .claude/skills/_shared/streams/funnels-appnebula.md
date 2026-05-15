@@ -24,7 +24,7 @@
 
 All AI-generated funnel cases MUST end with `(AI generated)` **suffix** at the end of the title.
 
-Example: `"Check successful payments for user with EU locale and email check (AI generated)"`
+Example: `"Check successful payments with email check (EU localization) (AI generated)"`
 
 > Funnels are the only stream using a suffix marker. All other streams use `[AI Generated][...]` prefix — see global rules.
 
@@ -34,21 +34,21 @@ Example: `"Check successful payments for user with EU locale and email check (AI
 
 | # | Title | Condition | Reference case |
 |---|-------|-----------|----------------|
-| 1 | Check successful payments for user with EU locale and email check | Always | C418133 |
-| 2 | Check successful subscription payment for user with USA locale | Always | C420186 |
-| 3 | Check flow for user with EU localization with subscription payment error | Always | C418136 |
-| 4 | Check flow for user with EU localization with additional discount payment | Always | C420182 |
-| 5 | Check flow for user with USA locale with error on upsell payments | Always | C420187 |
-| 6 | Verify funnel flow with failed {scan type} scan for EU users | Only if scan exists | C418137 |
-| 7 | Check flow for user with re-entering card after incorrect upsells payment | Always | C420183 |
-| 8 | Check successful subscription flows on LATAM localizations | Always | C420189 |
-| 9 | Check email marketing landing flow for EU user with email check | Always | C420184 |
-| 10 | Check email marketing paywall flow for EU user with email check | Always | C420185 |
+| 1 | Check successful payments with email check (EU localization) | Always | C418133 |
+| 2 | Check successful payments with email check (USA localization) | Always | C420186 |
+| 3 | Check successful payments with email check (LATAM localization) | Always | C420189 |
+| 4 | Check flow for user with additional discount payment (EU localization) | Always | C420182 |
+| 5 | Check flow for user with subscription payment error (EU localization) | Always | C418136 |
+| 6 | Verify funnel flow with failed {scan type} scan (EU localization) | Only if scan exists | C418137 |
+| 7 | Check flow for user with re-entering card after incorrect upsells payment (LATAM localization) | Always | C420183 |
+| 8 | Check upsell discount modal is visible after unsuccessful upsells payment (USA localization) | Only if downsells exists | C420187 |
+| 9 | Check email marketing landing flow with email check (EU localization) | Always | C420184 |
+| 10 | Check email marketing paywall flow with email check (EU localization) | Always — prod only | C420185 |
 | 11 | Check flow with successful payments for user with USA locale when timer has expired and email check | Always — set `custom_automation_status: 4` (Won't automate) | C425054 |
 | 12 | Check that emails are sent to user with confirmed email and valid payment (EU locale) for user with app installed | Always — set `custom_automation_status: 4` (Won't automate), manual only | C425055 |
 
 ### Title rules
-- Cases 1–5, 7–10: titles are **identical** across all funnels — do not change wording
+- Cases 1–5, 7, 9–10: titles are **identical** across all funnels — do not change wording
 - Case 6 — the only adapting title — replace `{scan type}` with the actual scan type:
   - hand scan → `palmistry`
   - face scan → `face`
@@ -58,9 +58,9 @@ Example: `"Check successful payments for user with EU locale and email check (AI
 ### Cases NOT in the standard per-funnel set
 | Title | Note |
 |-------|------|
-| Check flow for user with EU locale with resign form on payments | Automated once — only in section 49665 |
-| Check flow for user re-entering the funnel with already active subscription on UK locale | Automated once — only in section 49665 |
-| Check flow for user re-entering another funnel with already active subscription on US locale | Automated once — only in section 49665 |
+| Check flow with resign form on payments with email check (EU localization) | Automated once — only in section 49665 |
+| Check flow for user re-entering the funnel with already active subscription (UK localization) | Automated once — only in section 49665 |
+| Check flow for user re-entering another funnel with already active subscription (USA localization) | Automated once — only in section 49665 |
 
 ---
 
@@ -70,12 +70,12 @@ Example: `"Check successful payments for user with EU locale and email check (AI
 |------|--------|---------------|
 | 1 | EU, Accept cookies, CAMERA | Step 0 full flow + post-payment (with email button check) |
 | 2 | USA, no cookies, CAMERA | Step 0 full flow + post-payment (with email button check) |
-| 3 | EU, Accept cookies, CAMERA | Step 0 to paywall + declined card |
+| 3 | LATAM, no cookies, CAMERA | Step 0 full flow + post-payment (no email button check) |
 | 4 | EU, Accept cookies, CAMERA | Step 0 to paywall + declined → discount paywall + post-payment |
-| 5 | USA, no cookies, CAMERA | Step 0 to paywall + upsell fail × 2 + post-payment (no email button check) |
+| 5 | EU, Accept cookies, CAMERA | Step 0 to paywall + declined card |
 | 6 | EU, Accept cookies, FILE+CAMERA note | Step 0 to scan + fail/retry + payment + post-payment (no email button check) |
-| 7 | USA, no cookies, CAMERA | Step 0 to paywall + upsell fail + re-enter card + post-payment (no email button check) |
-| 8 | LATAM, no cookies, CAMERA | Step 0 full flow + post-payment (no email button check) |
+| 7 | LATAM, no cookies, CAMERA | Step 0 to paywall + upsell fail + re-enter card + post-payment (no email button check) |
+| 8 | USA, no cookies, CAMERA | Step 0 to paywall + upsell fail → discount modal check + re-enter card + post-payment (no email button check) |
 | 9 | EU, Accept cookies, CAMERA | Step 1 to email screen + Step 2 landing payment + post-payment |
 | 10 | EU, Accept cookies, CAMERA | Step 1 full flow + email consent + Step 2 email link + post-payment |
 | 11 | USA, no cookies, CAMERA | Step 0 to paywall → timer expires → post-timer payment + post-payment |
@@ -102,7 +102,7 @@ Verify post-payment state:
 - Reading type is available in the system as per test data
 ```
 
-### Case 1 — Check successful payments for user with EU locale and email check
+### Case 1 — Check successful payments with email check (EU localization)
 
 ```
 Step 0: Go through the full funnel flow using test data from preconditions
@@ -111,7 +111,7 @@ Step 0: Go through the full funnel flow using test data from preconditions
 Step 1: Verify post-payment state (see reusable step above)
 ```
 
-### Case 2 — Check successful subscription payment for user with USA locale
+### Case 2 — Check successful payments with email check (USA localization)
 
 Same step structure as Case 1. USA locale precondition differences:
 - No `Accept cookies` item
@@ -119,18 +119,11 @@ Same step structure as Case 1. USA locale precondition differences:
 - For manual tests: **Safari** browser (not Chrome)
 - Post-payment verification: same as Case 1 (includes email button check)
 
-### Case 3 — Check flow for user with EU localization with subscription payment error
+### Case 3 — Check successful payments with email check (LATAM localization)
 
-```
-Step 1: Go through the full funnel flow up to the paywall using test data from preconditions
-        → User reaches the paywall
+Same step structure as Case 1, but post-payment verification **omits email button check** (no email marketing flow for LATAM). No `Accept cookies` in preconditions.
 
-Step 2: Attempt payment with an invalid/declined card
-        → Payment is NOT successful — error is displayed; user remains on paywall
-```
-No post-payment verification — payment does not succeed.
-
-### Case 4 — Check flow for user with EU localization with additional discount payment
+### Case 4 — Check flow for user with additional discount payment (EU localization)
 
 ```
 Step 0: Go through the full funnel flow up to the paywall using test data from preconditions
@@ -145,25 +138,18 @@ Step 2: Click "Get secret discount" on the additionalDiscount page, then complet
 Step 3: Verify post-payment state (see reusable step above)
 ```
 
-### Case 5 — Check flow for user with USA locale with error on upsell payments
+### Case 5 — Check flow for user with subscription payment error (EU localization)
 
 ```
-Step 1: Go through the full funnel flow up to the paywall using test data from preconditions
+Step 0: Go through the full funnel flow up to the paywall using test data from preconditions
         → User reaches the paywall
 
-Step 2: Complete main subscription payment with a valid card (insufficient funds for recurring payments)
-        → Payment is successful; user is redirected to upsell page
-
-Step 3: Attempt upsell payment — fails; skip upsell offer
-        → Recurring payment error is displayed; price is in USD; user is navigated to consultation page
-
-Step 4: Attempt "Get my consultation" payment — fails; skip upsell offer
-        → Recurring payment error is displayed; price is in USD; user proceeds to post-payment flow
-
-Step 5: Verify post-payment state (omit email button check — USA upsell error flow)
+Step 1: Attempt payment with an invalid/declined card
+        → Payment is NOT successful — error is displayed; user remains on paywall
 ```
+No post-payment verification — payment does not succeed.
 
-### Case 6 — Verify funnel flow with failed {scan type} scan for EU users
+### Case 6 — Verify funnel flow with failed {scan type} scan (EU localization)
 
 > **Important:** Step 0 goes up to the **scan screen** (not paywall) — branching happens at the scan stage.
 
@@ -180,7 +166,7 @@ Step 3: Complete payment with a valid card
 Step 4: Verify post-payment state (omit email button check)
 ```
 
-### Case 7 — Check flow for user with re-entering card after incorrect upsells payment
+### Case 7 — Check flow for user with re-entering card after incorrect upsells payment (LATAM localization)
 
 ```
 Step 1: Go through the full funnel flow up to the paywall using test data from preconditions
@@ -198,11 +184,31 @@ Step 4: Attempt "Get my consultation" payment — fails; click "Try again" and r
 Step 5: Verify post-payment state (omit email button check)
 ```
 
-### Case 8 — Check successful subscription flows on LATAM localizations
+### Case 8 — Check upsell discount modal is visible after unsuccessful upsells payment (USA localization)
 
-Same step structure as Case 1, but post-payment verification **omits email button check** (no email marketing flow for LATAM). No `Accept cookies` in preconditions.
+```
+Step 0: Go through the full funnel flow up to the paywall using test data from preconditions
+        → User reaches the paywall
 
-### Case 9 — Check email marketing landing flow for EU user with email check
+Step 1: Complete main subscription payment with a valid card (insufficient funds for recurring payments)
+        → Payment is successful; user is redirected to upsell page
+
+Step 2: Attempt upsell payment — fails; check that upsell discount modal is displayed
+        → Recurring payment error is displayed; upsell discount modal is visible; price is in USD
+
+Step 3: Close discount modal and skip upsell offer; attempt consultation payment — fails;
+        click "Try again" and re-enter a valid card
+        → Recurring payment error is displayed; after re-entering valid card payment is successful;
+          user proceeds to post-payment flow
+
+Step 4: Verify post-payment state:
+        - Check in AskNebula that the user is assigned to the funnel they completed
+        - Check that the subscription is activated for the user
+        → User belongs to the correct funnel in AskNebula
+        → Subscription is active
+```
+
+### Case 9 — Check email marketing landing flow with email check (EU localization)
 
 ```
 Step 1: Go through the full funnel flow up to the email screen using test data from preconditions
@@ -216,7 +222,7 @@ Step 2: Open the email marketing landing page using the order_id from Step 1
 Step 3: Verify post-payment state (see reusable step above)
 ```
 
-### Case 10 — Check email marketing paywall flow for EU user with email check
+### Case 10 — Check email marketing paywall flow with email check (EU localization)
 
 ```
 Step 1: Go through the full funnel flow; enter email and give consent to email marketing
@@ -270,7 +276,8 @@ Look up in code FIRST. Ask only if not found. ONE QUESTION AT A TIME.
 | 10 | Email subject | `src/funnels/constants/email.ts` | Suggest by pattern: scan funnel → `'🔮 Get your {Funnel} and Palmistry Readings'`; no scan → `'🔮 Get your {Funnel Reading}'` |
 | 11 | Email button text | `src/funnels/constants/email.ts` | If found in code → use directly, do NOT ask |
 | 12 | Upsell? (no / ULTRA_PACK / CONSULTATION) | — | |
-| 13 | userData fields (gender, DOB, splits) | `tests/funnels/` | Ask one field at a time if not found |
+| 13 | Downsells? (yes/no) | — | Required for Case 8 — omit case if no downsells |
+| 14 | userData fields (gender, DOB, splits) | `tests/funnels/` | Ask one field at a time if not found |
 
 ---
 
@@ -280,7 +287,7 @@ Use this exact structure (see C418133 as reference):
 
 ```html
 <p>Funnel and its default flow is activated in Funnel builder</p>
-<p>Domain appnebula.co → <a href="https://appnebula.co/{funnel name}/prelanding">https://appnebula.co/{funnel name}/prelanding</a></p>
+<p>Domain appnebula.co → <a href="https://appnebula.co/{funnel name}/prelanding?utm_source=fb">https://appnebula.co/{funnel name}/prelanding?utm_source=fb</a></p>
 <p>User has EU locale</p>
 <p><strong>Test data:</strong></p>
 <ul>
@@ -296,6 +303,7 @@ Use this exact structure (see C418133 as reference):
 
 Key rules:
 - Funnel URL must be a clickable `<a>` link — always use `appnebula.co` domain, never `nebula-palmistry.com`
+- Always append `?utm_source=fb` to the funnel URL
 - All specific values (gender, date, goal, price) must be wrapped in `<strong>`
 - Zodiac sign must be inferred from the date and included in parentheses
 - Scan source must specify FILE or CAMERA with explanation
